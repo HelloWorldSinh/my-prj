@@ -1,14 +1,16 @@
-// import React, { useContext } from 'react';
-// import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-// import { AuthContext } from './context/AuthContext';
-// import Login from './components/Login';
-// import Register from './components/Register';
-// import StudentDashboard from './components/StudentDashBoard';
-// import TeacherDashboard from './components/TeacherDashBoard';
-// import CreateExam from './components/CreateExam';
-// import Exam from './components/Exam';
-// import Result from './components/Result';
-// import ExamList from './components/ExamList';
+import React, { useContext } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthContext } from './context/AuthContext';
+import Login from './components/Login';
+import Register from './components/Register';
+import StudentDashboard from './components/StudentDashBoard';
+import TeacherDashboard from './components/TeacherDashBoard';
+import CreateExam from './components/CreateExam';
+import Exam from './components/Exam';
+import Result from './components/Result';
+import ExamList from './components/ExamList';
+import HomePage from './components/HomePage';
+
 
 // const App = () => {
 //   const { user } = useContext(AuthContext);
@@ -116,6 +118,7 @@ const App = () => {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/select-role" element={<SelectRole />} /> {/* Add this */}

@@ -1,0 +1,57 @@
+.app-logo {
+  display: flex;
+  align-items: center;
+}
+
+.app-logo a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.app-logo a:hover {
+  transform: scale(1.05);
+}
+
+.app-logo img {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.app-logo span {
+  background: linear-gradient(to right, #ff4f9f, #b83dba);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+/* Size variations */
+.logo-small img {
+  height: 32px;
+  margin-right: 8px;
+}
+
+.logo-small span {
+  font-size: 1.2rem;
+}
+
+.logo-medium img {
+  height: 48px;
+  margin-right: 12px;
+}
+
+.logo-medium span {
+  font-size: 1.8rem;
+}
+
+.logo-large img {
+  height: 64px;
+  margin-right: 16px;
+}
+
+.logo-large span {
+  font-size: 2.4rem;
+}

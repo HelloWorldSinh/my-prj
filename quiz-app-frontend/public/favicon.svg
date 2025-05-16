@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="32" cy="32" r="32" fill="url(#paint0_linear)" />
+  
+  <!-- Stylized Q Letter -->
+  <path d="M24 19.2C24 14.7817 27.5817 11.2 32 11.2C36.4183 11.2 40 14.7817 40 19.2V33.6C40 38.0183 36.4183 41.6 32 41.6C27.5817 41.6 24 38.0183 24 33.6V19.2Z" fill="white"/>
+  <path d="M40 33.6C40 38.0183 36.4183 41.6 32 41.6C30.478 41.6 29.0451 41.2243 27.7946 40.5533L36.8 49.6L40 46.4L33.6 40L40 33.6Z" fill="white"/>
+  
+  <!-- Inner Cutout -->
+  <path d="M27.8 19.2C27.8 16.8705 29.6705 15 32 15C34.3295 15 36.2 16.8705 36.2 19.2V33.6C36.2 35.9295 34.3295 37.8 32 37.8C29.6705 37.8 27.8 35.9295 27.8 33.6V19.2Z" fill="#ff4f9f"/>
+  
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="paint0_linear" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff4f9f" />
+      <stop offset="1" stop-color="#b83dba" />
+    </linearGradient>
+  </defs>
+</svg>
