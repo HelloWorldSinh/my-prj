@@ -1,55 +1,55 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
 
 const Register = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [role, setRole] = useState('student');
-    const [email, setEmail] = useState('');
+    const [role, setRole] = useState("student");
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            await axios.post('http://localhost:5000/api/auth/register', {
-                username,
-                password,
-                role,
-                email,
-            });
-            alert('Registered successfully');
-        } catch (error) {
-            alert(error.response.data.message);
-        }
+    const handleGoogleRegister = () => {
+        window.location.href = "http://localhost:5000/api/auth/google";
     };
 
     return (
-        <div>
-            <h2>Register</h2>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-                <select value={role} onChange={(e) => setRole(e.target.value)}>
-                    <option value="student">Student</option>
-                    <option value="teacher">Teacher</option>
-                </select>
-                <button type="submit">Register</button>
-            </form>
+        <div style={{ textAlign: "center", padding: "20px" }}>
+            <h2>Tài Khoản Người Dùng</h2>
+            <p>Đăng nhập hoặc tạo tài khoản để bắt đầu trải nghiệm</p>
+            <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                style={{ margin: "10px" }}
+            >
+                <option value="student">Student</option>
+                <option value="teacher">Teacher</option>
+            </select>
+            <button
+                onClick={handleGoogleRegister}
+                style={{
+                    background: "#4285F4",
+                    color: "white",
+                    padding: "10px 20px",
+                    border: "none",
+                    cursor: "pointer",
+                }}
+            >
+                Đăng Ký
+            </button>
+            <div>
+                <button
+                    onClick={handleGoogleRegister}
+                    style={{
+                        background: "white",
+                        border: "1px solid #d3d3d3",
+                        padding: "10px",
+                        cursor: "pointer",
+                    }}
+                >
+                    <img
+                        src="https://www.google.com/favicon.ico"
+                        alt="Google"
+                        style={{ width: "20px", marginRight: "10px" }}
+                    />{" "}
+                    Đăng Nhập
+                </button>
+            </div>
+            <p style={{ color: "blue", cursor: "pointer" }}>Trợ Về Trang Chủ</p>
         </div>
     );
 };
