@@ -9,6 +9,7 @@ import CreateExam from './components/CreateExam';
 import Exam from './components/Exam';
 import Result from './components/Result';
 import ExamList from './components/ExamList';
+import HomePage from './components/HomePage';
 
 const App = () => {
   const { user } = useContext(AuthContext);
@@ -16,6 +17,7 @@ const App = () => {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route

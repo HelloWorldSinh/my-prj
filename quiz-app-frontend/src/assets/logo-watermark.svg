@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Stylized Q Letter -->
+  <path d="M187.5 150C187.5 115.482 215.482 87.5 250 87.5C284.518 87.5 312.5 115.482 312.5 150V262.5C312.5 297.018 284.518 325 250 325C215.482 325 187.5 297.018 187.5 262.5V150Z" fill="#ff4f9f" opacity="0.1"/>
+  <path d="M312.5 262.5C312.5 297.018 284.518 325 250 325C238.108 325 226.915 322.065 217.144 316.822L287.5 387.5L312.5 362.5L262.5 312.5L312.5 262.5Z" fill="#e63c8a" opacity="0.1"/>
+  
+  <!-- Inner Cutout -->
+  <path d="M217.5 150C217.5 132.051 232.051 117.5 250 117.5C267.949 117.5 282.5 132.051 282.5 150V262.5C282.5 280.449 267.949 295 250 295C232.051 295 217.5 280.449 217.5 262.5V150Z" fill="white" opacity="0.1"/>
+  
+  <!-- Quiz elements - dots and lines representing a quiz/test -->
+  <circle cx="200" cy="187.5" r="20" fill="#b83dba" opacity="0.1" />
+  <rect x="237.5" y="177.5" width="125" height="20" rx="10" fill="#b83dba" opacity="0.1" />
+  
+  <circle cx="200" cy="237.5" r="20" fill="#ff85a2" opacity="0.1" />
+  <rect x="237.5" y="227.5" width="100" height="20" rx="10" fill="#ff85a2" opacity="0.1" />
+</svg>

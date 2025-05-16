@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circles -->
+  <circle cx="100" cy="100" r="90" fill="url(#paint0_linear)" opacity="0.2" />
+  <circle cx="100" cy="100" r="75" fill="url(#paint0_linear)" opacity="0.3" />
+  
+  <!-- Stylized Q Letter -->
+  <path d="M75 60C75 46.1929 86.1929 35 100 35C113.807 35 125 46.1929 125 60V105C125 118.807 113.807 130 100 130C86.1929 130 75 118.807 75 105V60Z" fill="#ff4f9f"/>
+  <path d="M125 105C125 118.807 113.807 130 100 130C95.2433 130 90.7659 128.826 86.8577 126.729L115 155L125 145L105 125L125 105Z" fill="#e63c8a"/>
+  
+  <!-- Inner Cutout -->
+  <path d="M87 60C87 52.8203 92.8203 47 100 47C107.18 47 113 52.8203 113 60V105C113 112.18 107.18 118 100 118C92.8203 118 87 112.18 87 105V60Z" fill="white"/>
+  
+  <!-- Quiz elements - dots and lines representing a quiz/test -->
+  <circle cx="80" cy="75" r="8" fill="#b83dba" />
+  <rect x="95" y="71" width="50" height="8" rx="4" fill="#b83dba" />
+  
+  <circle cx="80" cy="95" r="8" fill="#ff85a2" />
+  <rect x="95" y="91" width="40" height="8" rx="4" fill="#ff85a2" />
+  
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="paint0_linear" x1="10" y1="10" x2="190" y2="190" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff4f9f" />
+      <stop offset="1" stop-color="#b83dba" />
+    </linearGradient>
+  </defs>
+</svg>
