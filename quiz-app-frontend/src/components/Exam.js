@@ -12,6 +12,10 @@ const Exam = () => {
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [loading, setLoading] = useState(true);
 
+    const [violationCount, setViolationCount] = useState(0);
+    const [showAlert, setShowAlert] = useState(false);
+    const [isLocked, setIsLocked] = useState(false);
+
     // Hàm trộn mảng (Fisher-Yates shuffle)
     const shuffleArray = (array) => {
         const newArray = [...array];
@@ -26,6 +30,10 @@ const Exam = () => {
         const fetchExam = async () => {
             setLoading(true);
             try {
+                // Bật toàn màn hình
+                if (document.documentElement.requestFullscreen) {
+                    await document.documentElement.requestFullscreen();
+                }
                 const res = await axios.get(`http://localhost:5000/api/exams/${code}`);
                 let questions = res.data.questions;
 
@@ -63,15 +71,63 @@ const Exam = () => {
         fetchExam();
     }, [code]);
 
+    // Phát hiện chuyển tab 
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                setViolationCount(prev => {
+                    const newCount = prev + 1;
+                    if (newCount >= 3) {
+                        setShowAlert(true);
+                        setIsLocked(true);
+                    }
+                    return newCount;
+                });
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, []);
+
+    // Phát hiện thoát màn hình
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            if (!document.fullscreenElement) {
+                setViolationCount(prev => {
+                    const newCount = prev + 1;
+                    if (newCount >= 3) {
+                        setShowAlert(true);
+                        setIsLocked(true);
+                    }
+                    return newCount;
+                });
+            }
+        };
+
+        document.addEventListener("fullscreenchange", handleFullscreenChange);
+        return () => {
+            document.removeEventListener("fullscreenchange", handleFullscreenChange);
+        };
+    }, []);
+
+    const handleConfirmCheating = () => {
+        navigate(`/result/${exam._id}`);
+    };
+
     const handleAnswer = (questionIndex, answerIndex) => {
         const newAnswers = [...answers];
         newAnswers[questionIndex] = answerIndex;
         setAnswers(newAnswers);
-    };    const handleSubmit = async () => {
+    };
+
+    const handleSubmit = async () => {
         if (!window.confirm('Bạn có chắc chắn muốn nộp bài không?')) {
             return;
         }
-        
+
         try {
             // Map lại chỉ số đáp án theo thứ tự gốc
             const submissionAnswers = shuffledQuestions.map((q, i) => {
@@ -145,11 +201,12 @@ const Exam = () => {
     return (
         <div className="exam-container">
             <h2 className="exam-title">{exam.title}</h2>
-            
+            <p style={{ color: 'red' }}>Số lần vi phạm: {violationCount} / 3</p>
+
             <div className="progress-container">
                 <div className="progress-bar">
-                    <div 
-                        className="progress-fill" 
+                    <div
+                        className="progress-fill"
                         style={{ width: `${progress.percent}%` }}
                     ></div>
                 </div>
@@ -157,10 +214,10 @@ const Exam = () => {
                     Đã trả lời {progress.answered}/{progress.total} câu hỏi
                 </div>
             </div>
-            
+
             <div className="pagination">
                 {shuffledQuestions.map((_, index) => (
-                    <div 
+                    <div
                         key={index}
                         className={`pagination-item ${index === currentQuestion ? 'active' : ''} ${answers[index] !== null ? 'answered' : ''}`}
                         onClick={() => goToQuestion(index)}
@@ -169,55 +226,55 @@ const Exam = () => {
                     </div>
                 ))}
             </div>
-            
+
             <div className="question-card">
                 <div className="question-header">
                     Câu hỏi {currentQuestion + 1}/{shuffledQuestions.length}
                 </div>
                 <div className="question-content">
                     <div className="question-text">{currentQuestionData.content}</div>
-                    
+
                     {currentQuestionData.media && (
                         <div className="media-container">
                             {currentQuestionData.media.endsWith('.mp3') ? (
-                                <audio 
+                                <audio
                                     className="audio-control"
-                                    controls 
-                                    src={`http://localhost:5000${currentQuestionData.media}`} 
+                                    controls
+                                    src={`http://localhost:5000${currentQuestionData.media}`}
                                 />
                             ) : (
-                                <img 
+                                <img
                                     className="question-image"
-                                    src={`http://localhost:5000${currentQuestionData.media}`} 
-                                    alt="Hình ảnh câu hỏi" 
+                                    src={`http://localhost:5000${currentQuestionData.media}`}
+                                    alt="Hình ảnh câu hỏi"
                                 />
                             )}
                         </div>
                     )}
-                    
+
                     <div className="answers-container">
                         {currentQuestionData.answers.map((answer, aIndex) => (
-                            <div 
+                            <div
                                 key={aIndex}
                                 className={`answer-item ${answers[currentQuestion] === aIndex ? 'selected' : ''}`}
                                 onClick={() => handleAnswer(currentQuestion, aIndex)}
                             >
                                 <div className="answer-radio"></div>
                                 <div className="answer-text">{answer.content}</div>
-                                
+
                                 {answer.media && (
                                     <div className="answer-media">
                                         {answer.media.endsWith('.mp3') ? (
-                                            <audio 
+                                            <audio
                                                 className="audio-control"
-                                                controls 
-                                                src={`http://localhost:5000${answer.media}`} 
+                                                controls
+                                                src={`http://localhost:5000${answer.media}`}
                                             />
                                         ) : (
-                                            <img 
-                                                src={`http://localhost:5000${answer.media}`} 
-                                                alt="Hình ảnh đáp án" 
-                                                style={{maxWidth: '200px'}}
+                                            <img
+                                                src={`http://localhost:5000${answer.media}`}
+                                                alt="Hình ảnh đáp án"
+                                                style={{ maxWidth: '200px' }}
                                             />
                                         )}
                                     </div>
@@ -227,27 +284,47 @@ const Exam = () => {
                     </div>
                 </div>
             </div>
-            
+
             <div className="navigation-buttons">
-                <button 
-                    className="nav-button prev" 
+                <button
+                    className="nav-button prev"
                     onClick={goToPrevQuestion}
                     disabled={currentQuestion === 0}
                 >
                     Câu trước
                 </button>
-                <button 
-                    className="nav-button next" 
+                <button
+                    className="nav-button next"
                     onClick={goToNextQuestion}
                     disabled={currentQuestion === shuffledQuestions.length - 1}
                 >
                     Câu tiếp theo
                 </button>
             </div>
-            
-            <button className="submit-button" onClick={handleSubmit}>
+
+            {!isLocked && (
+                <button className="submit-button" onClick={handleSubmit}>Nộp bài thi</button>
+            )}
+
+            {showAlert && (
+                <div style={{
+                    position: 'fixed',
+                    top: '30%',
+                    left: '30%',
+                    backgroundColor: 'white',
+                    border: '2px solid red',
+                    padding: '20px',
+                    zIndex: 9999,
+                    textAlign: 'center'
+                }}>
+                    <h2>Cảnh báo!</h2>
+                    <p>Chuyển tab hoặc thoát màn hình quá 3 lần. Bài thi kết thúc.</p>
+                    <button onClick={handleConfirmCheating}>OK</button>
+                </div>
+            )}
+            {/* <button className="submit-button" onClick={handleSubmit}>
                 Nộp bài
-            </button>
+            </button> */}
         </div>
     );
 };

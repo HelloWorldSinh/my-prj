@@ -10,7 +10,7 @@ const submissionSchema = new mongoose.Schema({
         },
     ],
     score: { type: Number },
-    submittedAt: { type: Date, default: Date.now },
+    submittedAt: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Submission', submissionSchema);

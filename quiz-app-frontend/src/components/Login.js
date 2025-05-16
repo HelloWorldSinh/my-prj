@@ -1,46 +1,30 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import React from "react";
 
 const Login = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const { login } = useContext(AuthContext);
-    const navigate = useNavigate();
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            await login(username, password);
-            const user = JSON.parse(localStorage.getItem('user'));
-            if (user.role === 'student') {
-                navigate('/student');
-            } else if (user.role === 'teacher') {
-                navigate('/teacher');
-            }
-        } catch (error) {
-            alert(error.response.data.message);
-        }
+    const handleGoogleLogin = () => {
+        window.location.href = "http://localhost:5000/api/auth/google";
     };
 
     return (
-        <div>
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                <button type="submit">Login</button>
-            </form>
+        <div style={{ textAlign: "center", padding: "20px" }}>
+            <h2>Tài Khoản Người Dùng</h2>
+            <p>Đăng nhập hoặc tạo tài khoản để bắt đầu trải nghiệm</p>
+            <button
+                onClick={handleGoogleLogin}
+                style={{
+                    background: "white",
+                    border: "1px solid #d3d3d3",
+                    padding: "10px",
+                    cursor: "pointer",
+                }}
+            >
+                <img
+                    src="https://www.google.com/favicon.ico"
+                    alt="Google"
+                    style={{ width: "20px", marginRight: "10px" }}
+                />{" "}
+                Đăng Nhập
+            </button>
         </div>
     );
 };

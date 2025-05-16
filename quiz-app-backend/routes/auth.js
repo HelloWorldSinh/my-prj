@@ -1,31 +1,62 @@
-const express = require('express');
-//const bcrypt = require('bcryptjs');//ma hoa password
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const express = require("express");
+const passport = require("passport");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 const router = express.Router();
 
-router.post('/register', async (req, res) => {
-    const { username, password, role, email } = req.body;
-    try {
-        //const hashedPassword = await bcrypt.hash(password, 10);
-        //const user = new User({ username, password: hashedPassword, role, email });
-        const user = new User({ username, password, role, email });
-        await user.save();
-        res.status(201).json({ message: 'User registered' });
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-});
+// Google OAuth routes
+router.get(
+    "/google",
+    passport.authenticate("google", {
+        scope: ["profile", "email"],
+        prompt: "select_account", // Thêm tham số prompt
+    })
+);
 
-router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-    try {
-        const user = await User.findOne({ username });
-        if (!user || !(password == user.password)/*(await bcrypt.compare(password, user.password))*/) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+router.get(
+    "/google/callback",
+    passport.authenticate("google", { failureRedirect: "/login" }),
+    async (req, res) => {
+        const user = req.user;
+        console.log("Google callback - User from DB:", user); // Debug
+        if (user.role === null) {
+            console.log(
+                "Google callback - Role is null, redirecting to /select-role"
+            ); // Debug
+            return res.redirect(
+                `http://localhost:3000/select-role?googleId=${user.googleId}`
+            );
         }
-        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30m' });
-        res.json({ token, role: user.role });
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "30m" }
+        );
+        console.log("Google callback - Redirecting to dashboard with:", {
+            token,
+            role: user.role,
+        }); // Debug
+        res.redirect(
+            `http://localhost:3000/dashboard?token=${token}&role=${user.role}`
+        );
+    }
+);
+
+// Route to set role during first registration
+router.post("/set-role", async (req, res) => {
+    const { googleId, role } = req.body;
+    try {
+        const user = await User.findOneAndUpdate(
+            { googleId },
+            { role },
+            { new: true }
+        );
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "30m" }
+        );
+        res.status(200).json({ token, role: user.role });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
