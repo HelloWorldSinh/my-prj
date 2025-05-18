@@ -7,23 +7,27 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
+        // Kiểm tra URL nếu có token và role từ callback Google
+        const queryParams = new URLSearchParams(window.location.search);
+        const token = queryParams.get("token");
+        const role = queryParams.get("role");
+        
+        if (token && role) {
+            localStorage.setItem("token", token);
+            localStorage.setItem("user", JSON.stringify({ role }));
             axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-            setUser(JSON.parse(localStorage.getItem("user")));
+            setUser({ role });
+            // Xóa query params từ URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        } else {
+            // Trường hợp đã lưu token trước đó
+            const savedToken = localStorage.getItem("token");
+            if (savedToken) {
+                axios.defaults.headers.common["Authorization"] = `Bearer ${savedToken}`;
+                setUser(JSON.parse(localStorage.getItem("user")));
+            }
         }
     }, []);
-
-    const login = async (username, password) => {
-        const res = await axios.post("http://localhost:5000/api/auth/login", {
-            username,
-            password,
-        });
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("user", JSON.stringify({ role: res.data.role }));
-        axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
-        setUser({ role: res.data.role });
-    };
 
     // Hàm logout
     const logout = () => {
@@ -36,7 +40,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, logout }}>
             {children}
         </AuthContext.Provider>
     );
