@@ -148,12 +148,11 @@ const CreateExam = () => {
 
     return (
         <div className="exam-creator">
-            <h2 className="exam-title">Create Exam</h2>
+            <h2 className="exam-title">Tạo bài kiểm tra</h2>
             {!examId ? (
-                <form onSubmit={handleCreateExam} className="exam-form">
-                    <input
+                <form onSubmit={handleCreateExam} className="exam-form">                    <input
                         type="text"
-                        placeholder="Exam title"
+                        placeholder="Nhập tiêu đề bài kiểm tra"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         required
@@ -163,21 +162,21 @@ const CreateExam = () => {
                         value={startTime}
                         onChange={(e) => setStartTime(e.target.value)}
                         required
-                        placeholder="Start Time"
+                        placeholder="Thời gian bắt đầu"
                     />
                     <input
                         type="datetime-local"
                         value={endTime}
                         onChange={(e) => setEndTime(e.target.value)}
                         required
-                        placeholder="End Time"
-                    />
-                    <button type="submit" className="btn btn-primary">Create Exam</button>
+                        placeholder="Thời gian kết thúc"
+                    /><button type="submit" className="btn btn-primary">
+                        <i className="fas fa-plus-circle"></i> Tạo bài kiểm tra
+                    </button>
                 </form>
             ) : (
-                <div>
-                    <div className="exam-code">
-                        <h3>Exam Code:</h3>
+                <div>                    <div className="exam-code">
+                        <h3>Mã bài kiểm tra:</h3>
                         <span className="exam-code-value">{examCode}</span>
                     </div>
                     {questions.map((question, index) => (
@@ -185,28 +184,26 @@ const CreateExam = () => {
                             key={index}
                             className="question-card"
                             onClick={() => !question.isEditing && handleEditQuestion(index)}
-                        >
-                            <div className="question-header">
-                                <h4>Question {index + 1}</h4>
+                        >                            <div className="question-header">
+                                <h4><i className="fas fa-question-circle"></i> Câu hỏi {index + 1}</h4>
                             </div>
                             {question.isEditing ? (
-                                <div className="question-content">
-                                    <input
+                                <div className="question-content">                                    <input
                                         type="text"
                                         className="question-input"
-                                        placeholder="Question content"
+                                        placeholder="Nhập nội dung câu hỏi"
                                         value={question.content}
                                         onChange={(e) => handleUpdateQuestion(index, 'content', e.target.value)}
-                                    />
-                                    <div className="file-input-container">
+                                    /><div className="file-input-container">
                                         <label className="file-input-label">
+                                            <i className="fas fa-cloud-upload-alt"></i>
                                             <input
                                                 type="file"
                                                 className="file-input"
                                                 accept="image/*,audio/*"
                                                 onChange={(e) => handleUpdateQuestion(index, 'media', e.target.files[0])}
                                             />
-                                            {question.media ? 'Change Media' : 'Upload Media'}
+                                            {question.media ? 'Đổi tệp' : 'Tải lên tệp đa phương tiện'}
                                         </label>
                                         <span className="file-name">{question.media ? question.media.name : ''}</span>
                                     </div>
@@ -234,20 +231,18 @@ const CreateExam = () => {
                                                 key={ansIndex}
                                                 className="answer-item"
                                             >
-                                                <div className="answer-label">{getAnswerLabel(ansIndex)}</div>
-                                                <input
+                                                <div className="answer-label">{getAnswerLabel(ansIndex)}</div>                                                <input
                                                     type="text"
                                                     className="answer-input"
-                                                    placeholder="Answer content"
+                                                    placeholder="Nhập nội dung đáp án"
                                                     value={answer.content}
                                                     onChange={(e) => {
                                                         const newAnswers = [...question.answers];
                                                         newAnswers[ansIndex].content = e.target.value;
                                                         handleUpdateQuestion(index, 'answers', newAnswers);
                                                     }}
-                                                />
-                                                <label className="correct-checkbox">
-                                                    Correct
+                                                />                                                <label className="correct-checkbox">
+                                                    Đáp án đúng
                                                     <input
                                                         type="checkbox"
                                                         checked={answer.isCorrect}
@@ -257,31 +252,29 @@ const CreateExam = () => {
                                                             handleUpdateQuestion(index, 'answers', newAnswers);
                                                         }}
                                                     />
-                                                </label>
-                                                <button
+                                                </label><button
                                                     type="button"
                                                     className="btn btn-danger btn-small"
                                                     onClick={() => handleRemoveAnswer(index, ansIndex)}
                                                 >
-                                                    Delete
+                                                    <i className="fas fa-trash-alt"></i> Xóa
                                                 </button>
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="action-buttons">
-                                        <button
+                                    <div className="action-buttons">                                        <button
                                             type="button"
                                             className="btn btn-primary"
                                             onClick={() => handleAddAnswer(index)}
                                         >
-                                            Add Answer
+                                            <i className="fas fa-plus"></i> Thêm đáp án
                                         </button>
                                         <button
                                             type="button"
                                             className="btn btn-success"
                                             onClick={() => handleAddQuestion(index)}
                                         >
-                                            Add Question
+                                            <i className="fas fa-question-circle"></i> Thêm câu hỏi
                                         </button>
                                     </div>
                                 </div>
@@ -316,27 +309,26 @@ const CreateExam = () => {
                                                 <div className="answer-content">{ans.content}</div>
                                             </li>
                                         ))}
-                                    </ul>
-                                    <button
+                                    </ul>                                    <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleRemoveQuestion(index);
                                         }}
                                         className="btn btn-danger"
                                     >
-                                        Delete
+                                        <i className="fas fa-trash"></i> Xóa
                                     </button>
                                 </div>
                             )}
                         </div>
-                    ))}
-                    <div className="shuffle-options">
+                    ))}                    <div className="shuffle-options">
                         <label className="shuffle-option">
                             <input
                                 type="checkbox"
                                 checked={shuffleQuestions}
                                 onChange={(e) => setShuffleQuestions(e.target.checked)}
                             />
+                            <i className="fas fa-random"></i>
                             Trộn câu hỏi
                         </label>
                         <label className="shuffle-option">
@@ -345,14 +337,14 @@ const CreateExam = () => {
                                 checked={shuffleAnswers}
                                 onChange={(e) => setShuffleAnswers(e.target.checked)}
                             />
+                            <i className="fas fa-random"></i>
                             Trộn đáp án
                         </label>
-                    </div>
-                    <button
+                    </div>                    <button
                         onClick={handleCompleteExam}
                         className="complete-btn"
                     >
-                        Complete Exam
+                        <i className="fas fa-paper-plane"></i> Hoàn thành bài kiểm tra
                     </button>
                 </div>
             )}

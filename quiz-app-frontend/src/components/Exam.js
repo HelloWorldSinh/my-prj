@@ -201,17 +201,18 @@ const Exam = () => {
     return (
         <div className="exam-container">
             <h2 className="exam-title">{exam.title}</h2>
-            <p style={{ color: 'red' }}>Số lần vi phạm: {violationCount} / 3</p>
-
-            <div className="progress-container">
+            <p style={{ color: 'red' }}>Số lần vi phạm: {violationCount} / 3</p>            <div className="progress-container">
+                <div className="progress-info">
+                    <div className="progress-label">Tiến độ làm bài:</div>
+                    <div className="progress-text">
+                        <i className="fas fa-check-circle"></i> Đã trả lời {progress.answered}/{progress.total} câu hỏi
+                    </div>
+                </div>
                 <div className="progress-bar">
                     <div
                         className="progress-fill"
                         style={{ width: `${progress.percent}%` }}
                     ></div>
-                </div>
-                <div className="progress-text">
-                    Đã trả lời {progress.answered}/{progress.total} câu hỏi
                 </div>
             </div>
 
@@ -225,11 +226,9 @@ const Exam = () => {
                         {index + 1}
                     </div>
                 ))}
-            </div>
-
-            <div className="question-card">
+            </div>            <div className="question-card">
                 <div className="question-header">
-                    Câu hỏi {currentQuestion + 1}/{shuffledQuestions.length}
+                    <i className="fas fa-question-circle"></i> Câu hỏi {currentQuestion + 1}/{shuffledQuestions.length}
                 </div>
                 <div className="question-content">
                     <div className="question-text">{currentQuestionData.content}</div>
@@ -283,43 +282,37 @@ const Exam = () => {
                         ))}
                     </div>
                 </div>
-            </div>
-
-            <div className="navigation-buttons">
+            </div>            <div className="navigation-buttons">
                 <button
                     className="nav-button prev"
                     onClick={goToPrevQuestion}
                     disabled={currentQuestion === 0}
                 >
-                    Câu trước
+                    <i className="fas fa-chevron-left"></i> Câu trước
                 </button>
                 <button
                     className="nav-button next"
                     onClick={goToNextQuestion}
                     disabled={currentQuestion === shuffledQuestions.length - 1}
                 >
-                    Câu tiếp theo
+                    Câu tiếp theo <i className="fas fa-chevron-right"></i>
                 </button>
-            </div>
-
-            {!isLocked && (
-                <button className="submit-button" onClick={handleSubmit}>Nộp bài thi</button>
-            )}
-
-            {showAlert && (
-                <div style={{
-                    position: 'fixed',
-                    top: '30%',
-                    left: '30%',
-                    backgroundColor: 'white',
-                    border: '2px solid red',
-                    padding: '20px',
-                    zIndex: 9999,
-                    textAlign: 'center'
-                }}>
-                    <h2>Cảnh báo!</h2>
-                    <p>Chuyển tab hoặc thoát màn hình quá 3 lần. Bài thi kết thúc.</p>
-                    <button onClick={handleConfirmCheating}>OK</button>
+            </div>            {!isLocked && (
+                <button className="submit-button" onClick={handleSubmit}>
+                    <i className="fas fa-paper-plane"></i> Nộp bài thi
+                </button>
+            )}{showAlert && (
+                <div className="warning-dialog">
+                    <div className="warning-content">
+                        <div className="warning-icon">
+                            <i className="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h2>Cảnh báo!</h2>
+                        <p>Chuyển tab hoặc thoát màn hình quá 3 lần. Bài thi đã kết thúc.</p>
+                        <button className="warning-button" onClick={handleConfirmCheating}>
+                            <i className="fas fa-check"></i> Xác nhận
+                        </button>
+                    </div>
                 </div>
             )}
             {/* <button className="submit-button" onClick={handleSubmit}>

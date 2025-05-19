@@ -81,8 +81,7 @@ const StudentDashboard = () => {
                     <h3><i className="fas fa-pen"></i> Tham gia bài kiểm tra</h3>
                 </div>
                 <div className="card-body">
-                    <p>Nhập mã bài kiểm tra để bắt đầu làm bài</p>
-                    <form onSubmit={handleJoin} className="join-form">
+                    <p>Nhập mã bài kiểm tra để bắt đầu làm bài</p>                    <form onSubmit={handleJoin} className="join-form">
                         <div className="input-group code-input-group">
                             <i className="fas fa-key"></i>
                             <input 
@@ -91,10 +90,11 @@ const StudentDashboard = () => {
                                 value={code} 
                                 onChange={(e) => setCode(e.target.value)}
                                 disabled={isLoading}
-                                className="code-input"
+                                className={`code-input ${code ? 'has-value' : ''}`}
                                 autoComplete="off"
                                 maxLength="10"
                             />
+                            <span className="input-focus-effect"></span>
                             {code && (
                                 <span className="clear-input" onClick={() => setCode("")}>
                                     <i className="fas fa-times-circle"></i>
@@ -105,18 +105,19 @@ const StudentDashboard = () => {
                             type="submit" 
                             className="btn btn-primary join-btn"
                             disabled={isLoading || !code.trim()}
-                        >
-                            {isLoading ? (
-                                <>
-                                    <div className="loading-spinner"></div>
-                                    <span>Đang tìm...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <i className="fas fa-sign-in-alt"></i>
-                                    <span>Tham gia</span>
-                                </>
-                            )}
+                        >                            <span className="btn-content">
+                                {isLoading ? (
+                                    <>
+                                        <div className="loading-spinner"></div>
+                                        <span>Đang tìm...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="fas fa-sign-in-alt"></i>
+                                        <span>Tham gia</span>
+                                    </>
+                                )}
+                            </span>
                         </button>
                     </form>
                 </div>

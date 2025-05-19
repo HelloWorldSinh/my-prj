@@ -101,12 +101,15 @@ const TeacherDashboard = () => {
             {/* Recent Exams */}
             <div className="exams-section">
                 <h3><i className="fas fa-clipboard-list"></i> Danh sách bài kiểm tra gần đây</h3>
-                
-                <div className="no-exams">
+                  <div className="no-exams">
                     <i className="far fa-clipboard"></i>
                     <p>Chưa có bài kiểm tra nào</p>
-                    <button className="btn btn-primary" onClick={handleCreateExam}>
-                        <i className="fas fa-plus"></i> Tạo bài kiểm tra mới
+                    <button className="btn btn-primary create-exam-btn" onClick={handleCreateExam}>
+                        <span className="btn-content">
+                            <i className="fas fa-plus animated-icon"></i> 
+                            <span>Tạo bài kiểm tra mới</span>
+                        </span>
+                        <span className="btn-shine"></span>
                     </button>
                 </div>
             </div>
@@ -117,10 +120,13 @@ const TeacherDashboard = () => {
     const renderExamsTab = () => (
         <div className="exams-section">
             <h3><i className="fas fa-clipboard-list"></i> Quản lý bài kiểm tra</h3>
-            
-            <div className="exam-actions">
-                <button className="btn btn-primary" onClick={handleCreateExam}>
-                    <i className="fas fa-plus"></i> Tạo bài kiểm tra mới
+              <div className="exam-actions">
+                <button className="btn btn-primary create-exam-btn" onClick={handleCreateExam}>
+                    <span className="btn-content">
+                        <i className="fas fa-plus animated-icon"></i> 
+                        <span>Tạo bài kiểm tra mới</span>
+                    </span>
+                    <span className="btn-shine"></span>
                 </button>
                 
                 <div className="search-bar">
@@ -341,10 +347,12 @@ const TeacherDashboard = () => {
                         <h2>Xin chào, {userName}!</h2>
                         <p>{currentTime}</p>
                     </div>
-                    <div className="header-actions">
-                        <button className="btn btn-create" onClick={handleCreateExam}>
-                            <i className="fas fa-plus"></i>
-                            <span>Tạo bài kiểm tra mới</span>
+                    <div className="header-actions">                        <button className="btn btn-create create-exam-btn" onClick={handleCreateExam}>
+                            <span className="btn-content">
+                                <i className="fas fa-plus animated-icon"></i>
+                                <span>Tạo bài kiểm tra mới</span>
+                            </span>
+                            <span className="btn-shine"></span>
                         </button>
                         <div className="user-profile" onClick={toggleProfileDropdown}>
                             <div className="avatar">
