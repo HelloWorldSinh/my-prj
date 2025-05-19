@@ -26,6 +26,7 @@ const SelectRole = () => {
         token: res.data.token,
         user: JSON.stringify({ role: res.data.role }),
       }); // Debug
+      alert("Bạn đã đăng kí thành công, chuyển hướng qua trang đăng nhập");
       navigate("/dashboard");
     } catch (error) {
       console.error(

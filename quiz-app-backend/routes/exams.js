@@ -75,6 +75,16 @@ router.post('/questions', auth, upload.single('media'), async (req, res) => {
     }
 });
 
+router.get('/teacher', auth, async (req, res) => {
+    if (req.user.role !== 'teacher') return res.status(403).json({ message: 'Only teachers can view their exams' });
+    try {
+        const exams = await Exam.find({ teacherId: req.user.id }).select('code title startTime endTime');
+        res.json(exams);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
 router.get('/:code', auth, async (req, res) => {
     try {
         const exam = await Exam.findOne({ code: req.params.code }).populate('questions');
@@ -85,11 +95,18 @@ router.get('/:code', auth, async (req, res) => {
     }
 });
 
-router.get('/teacher', auth, async (req, res) => {
-    if (req.user.role !== 'teacher') return res.status(403).json({ message: 'Only teachers can view their exams' });
+router.delete('/:examId', auth, async (req, res) => {
+    if (req.user.role !== 'teacher') return res.status(403).json({ message: 'Only teachers can delete exams' });
     try {
-        const exams = await Exam.find({ teacherId: req.user.id }).select('code title startTime endTime');
-        res.json(exams);
+        const exam = await Exam.findById(req.params.examId);
+        if (!exam) return res.status(404).json({ message: 'Exam not found' });
+        if (exam.teacherId.toString() !== req.user.id) return res.status(403).json({ message: 'Unauthorized' });
+
+        // Xóa tất cả câu hỏi liên quan đến bài thi
+        await Question.deleteMany({ examId: req.params.examId });
+        // Xóa bài thi
+        await Exam.findByIdAndDelete(req.params.examId);
+        res.json({ message: 'Exam deleted successfully' });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

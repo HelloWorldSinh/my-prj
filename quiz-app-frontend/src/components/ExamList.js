@@ -25,6 +25,21 @@ const ExamList = () => {
         fetchExams();
     }, []);
 
+    const handleDelete = async (examId) => {
+        if (!window.confirm('Are you sure you want to delete this exam?')) return;
+
+        try {
+            await axios.delete(`http://localhost:5000/api/exams/${examId}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            setExams(exams.filter((exam) => exam._id !== examId));
+        } catch (err) {
+            setError(err.response?.data?.message || 'Error deleting exam');
+        }
+    };
+
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
 
@@ -50,6 +65,14 @@ const ExamList = () => {
                                 <td>{exam.code}</td>
                                 <td>{new Date(exam.startTime).toLocaleString()}</td>
                                 <td>{new Date(exam.endTime).toLocaleString()}</td>
+                                <td>
+                                    <button
+                                        onClick={() => handleDelete(exam._id)}
+                                        style={{ color: 'red', cursor: 'pointer' }}
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>

@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
         const queryParams = new URLSearchParams(window.location.search);
         const token = queryParams.get("token");
         const role = queryParams.get("role");
-        
+
         if (token && role) {
             localStorage.setItem("token", token);
             localStorage.setItem("user", JSON.stringify({ role }));
@@ -30,13 +30,20 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     // Hàm logout
-    const logout = () => {
+    const logout = async (navigate) => {
+        try {
+            // Gọi API đăng xuất phía server (nếu có)
+            await axios.get("http://localhost:5000/api/auth/logout");
+        } catch (error) {
+            console.error("Error during server logout:", error);
+        }
+        // Xóa trạng thái phía client
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         delete axios.defaults.headers.common["Authorization"];
         setUser(null);
-        // Thêm bước đăng xuất khỏi Google
-        window.location.href = "https://accounts.google.com/Logout";
+        // Điều hướng về trang đăng nhập
+        navigate("/login");
     };
 
     return (

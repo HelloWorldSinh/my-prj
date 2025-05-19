@@ -22,9 +22,9 @@ const StudentDashboard = () => {
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             setCurrentTime(now.toLocaleDateString('vi-VN', options));
         };
-        
+
         updateTime();
-        
+
         // Lấy tên người dùng từ email
         if (user && user.email) {
             const emailName = user.email.split("@")[0];
@@ -38,7 +38,7 @@ const StudentDashboard = () => {
             alert("Vui lòng nhập mã bài kiểm tra!");
             return;
         }
-        
+
         setIsLoading(true);
         try {
             const res = await axios.get(`http://localhost:5000/api/exams/${code}`);
@@ -50,9 +50,8 @@ const StudentDashboard = () => {
         }
     };
 
-    const handleLogout = () => {
-        logout();
-        navigate("/login");
+    const handleLogout = async () => {
+        await logout(navigate);
     };
 
     const toggleProfileDropdown = () => {
@@ -61,7 +60,7 @@ const StudentDashboard = () => {
 
     // Hàm hiển thị nội dung theo tab được chọn
     const renderContent = () => {
-        switch(activeTab) {
+        switch (activeTab) {
             case "history":
                 return renderHistoryTab();
             case "results":
@@ -84,10 +83,10 @@ const StudentDashboard = () => {
                     <p>Nhập mã bài kiểm tra để bắt đầu làm bài</p>                    <form onSubmit={handleJoin} className="join-form">
                         <div className="input-group code-input-group">
                             <i className="fas fa-key"></i>
-                            <input 
-                                type="text" 
-                                placeholder="Nhập mã bài kiểm tra" 
-                                value={code} 
+                            <input
+                                type="text"
+                                placeholder="Nhập mã bài kiểm tra"
+                                value={code}
                                 onChange={(e) => setCode(e.target.value)}
                                 disabled={isLoading}
                                 className={`code-input ${code ? 'has-value' : ''}`}
@@ -101,8 +100,8 @@ const StudentDashboard = () => {
                                 </span>
                             )}
                         </div>
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             className="btn btn-primary join-btn"
                             disabled={isLoading || !code.trim()}
                         >                            <span className="btn-content">
@@ -122,10 +121,10 @@ const StudentDashboard = () => {
                     </form>
                 </div>
             </div>
-            
+
             <div className="recent-exams-section">
                 <h3><i className="fas fa-history"></i> Bài kiểm tra gần đây</h3>
-                
+
                 <div className="recent-exams-list">
                     <div className="no-exams">
                         <i className="far fa-clipboard"></i>
@@ -140,7 +139,7 @@ const StudentDashboard = () => {
     const renderHistoryTab = () => (
         <div className="recent-exams-section">
             <h3><i className="fas fa-history"></i> Bài kiểm tra đã làm</h3>
-            
+
             <div className="stats-cards">
                 <div className="stat-card">
                     <div className="stat-icon blue">
@@ -151,7 +150,7 @@ const StudentDashboard = () => {
                         <p>0</p>
                     </div>
                 </div>
-                
+
                 <div className="stat-card">
                     <div className="stat-icon green">
                         <i className="fas fa-check-circle"></i>
@@ -161,7 +160,7 @@ const StudentDashboard = () => {
                         <p>0</p>
                     </div>
                 </div>
-                
+
                 <div className="stat-card">
                     <div className="stat-icon purple">
                         <i className="fas fa-trophy"></i>
@@ -172,7 +171,7 @@ const StudentDashboard = () => {
                     </div>
                 </div>
             </div>
-            
+
             <div className="exams-table">
                 <div className="table-header">
                     <div className="th-title">Tên bài kiểm tra</div>
@@ -181,7 +180,7 @@ const StudentDashboard = () => {
                     <div className="th-score">Điểm số</div>
                     <div className="th-actions">Xem chi tiết</div>
                 </div>
-                
+
                 <div className="no-exams">
                     <i className="far fa-clipboard"></i>
                     <p>Chưa có bài kiểm tra nào</p>
@@ -194,7 +193,7 @@ const StudentDashboard = () => {
     const renderResultsTab = () => (
         <div className="recent-exams-section">
             <h3><i className="fas fa-chart-bar"></i> Kết quả học tập</h3>
-            
+
             <div className="stats-cards">
                 <div className="stat-card">
                     <div className="stat-icon blue">
@@ -205,7 +204,7 @@ const StudentDashboard = () => {
                         <p>0</p>
                     </div>
                 </div>
-                
+
                 <div className="stat-card">
                     <div className="stat-icon green">
                         <i className="fas fa-check-circle"></i>
@@ -215,7 +214,7 @@ const StudentDashboard = () => {
                         <p>0%</p>
                     </div>
                 </div>
-                
+
                 <div className="stat-card">
                     <div className="stat-icon purple">
                         <i className="fas fa-clock"></i>
@@ -226,7 +225,7 @@ const StudentDashboard = () => {
                     </div>
                 </div>
             </div>
-            
+
             <div className="analytics-section">
                 <h4><i className="fas fa-chart-line"></i> Biểu đồ tiến độ</h4>
                 <div className="empty-chart">
@@ -241,7 +240,7 @@ const StudentDashboard = () => {
     const renderSettingsTab = () => (
         <div className="settings-section">
             <h3><i className="fas fa-user-cog"></i> Cài đặt tài khoản</h3>
-            
+
             <div className="profile-card">
                 <div className="profile-header">
                     <div className="profile-avatar">
@@ -252,7 +251,7 @@ const StudentDashboard = () => {
                         <p>{user?.email || "email@example.com"}</p>
                     </div>
                 </div>
-                
+
                 <div className="form-section">
                     <h4><i className="fas fa-user"></i> Thông tin cá nhân</h4>
                     <div className="form-group">
@@ -264,10 +263,10 @@ const StudentDashboard = () => {
                         <input type="email" className="form-control" value={user?.email || ""} disabled />
                     </div>
                 </div>
-                
+
                 <div className="form-section">
                     <h4><i className="fas fa-bell"></i> Cài đặt thông báo</h4>
-                    
+
                     <div className="toggle-option">
                         <span>Nhận email thông báo khi có bài kiểm tra mới</span>
                         <label className="switch">
@@ -275,7 +274,7 @@ const StudentDashboard = () => {
                             <span className="slider round"></span>
                         </label>
                     </div>
-                    
+
                     <div className="toggle-option">
                         <span>Nhận email thông báo kết quả bài kiểm tra</span>
                         <label className="switch">
@@ -284,7 +283,7 @@ const StudentDashboard = () => {
                         </label>
                     </div>
                 </div>
-                
+
                 <div className="form-actions">
                     <button className="btn btn-secondary">Hủy thay đổi</button>
                     <button className="btn btn-primary">Lưu thay đổi</button>
@@ -301,30 +300,30 @@ const StudentDashboard = () => {
                     <img src={logo} alt="Logo" className="sidebar-logo" />
                     <span className="sidebar-title">Quiz App</span>
                 </div>
-                
+
                 <div className="sidebar-menu">
-                    <div 
+                    <div
                         className={`menu-item ${activeTab === "home" ? "active" : ""}`}
                         onClick={() => setActiveTab("home")}
                     >
                         <i className="fas fa-home"></i>
                         <span>Trang chủ</span>
                     </div>
-                    <div 
+                    <div
                         className={`menu-item ${activeTab === "history" ? "active" : ""}`}
                         onClick={() => setActiveTab("history")}
                     >
                         <i className="fas fa-clipboard-list"></i>
                         <span>Bài kiểm tra đã làm</span>
                     </div>
-                    <div 
+                    <div
                         className={`menu-item ${activeTab === "results" ? "active" : ""}`}
                         onClick={() => setActiveTab("results")}
                     >
                         <i className="fas fa-chart-bar"></i>
                         <span>Kết quả học tập</span>
                     </div>
-                    <div 
+                    <div
                         className={`menu-item ${activeTab === "settings" ? "active" : ""}`}
                         onClick={() => setActiveTab("settings")}
                     >
@@ -332,7 +331,7 @@ const StudentDashboard = () => {
                         <span>Cài đặt tài khoản</span>
                     </div>
                 </div>
-                
+
                 <div className="sidebar-footer">
                     <button className="logout-button" onClick={handleLogout}>
                         <i className="fas fa-sign-out-alt"></i>
@@ -340,7 +339,7 @@ const StudentDashboard = () => {
                     </button>
                 </div>
             </div>
-            
+
             {/* Main Content */}
             <div className="dashboard-main">
                 <div className="dashboard-header">
@@ -353,7 +352,7 @@ const StudentDashboard = () => {
                             <div className="avatar">
                                 {userName.charAt(0).toUpperCase()}
                             </div>
-                            
+
                             {showProfileDropdown && (
                                 <div className="profile-dropdown">
                                     <div className="profile-header">
@@ -375,7 +374,7 @@ const StudentDashboard = () => {
                         </div>
                     </div>
                 </div>
-                
+
                 <div className="dashboard-content">
                     {renderContent()}
                 </div>
