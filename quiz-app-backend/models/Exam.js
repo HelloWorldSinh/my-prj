@@ -10,6 +10,7 @@ const examSchema = new mongoose.Schema({
     shuffleQuestions: { type: Boolean, default: false },
     shuffleAnswers: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now },
+    duration: { type: Number, required: true }, // Thời gian làm bài (phút)
 });
 
 module.exports = mongoose.model('Exam', examSchema);

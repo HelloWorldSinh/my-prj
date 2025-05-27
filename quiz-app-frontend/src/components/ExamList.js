@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const ExamList = () => {
     const [exams, setExams] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchExams = async () => {
@@ -65,6 +67,14 @@ const ExamList = () => {
                                 <td>{exam.code}</td>
                                 <td>{new Date(exam.startTime).toLocaleString()}</td>
                                 <td>{new Date(exam.endTime).toLocaleString()}</td>
+                                <td>
+                                    <button
+                                        onClick={() => navigate(`/exams/edit/${exam._id}`)}
+                                        style={{ color: 'blue', cursor: 'pointer' }}
+                                    >
+                                        Edit
+                                    </button>
+                                </td>
                                 <td>
                                     <button
                                         onClick={() => handleDelete(exam._id)}

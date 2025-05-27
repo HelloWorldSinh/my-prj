@@ -11,23 +11,36 @@ const CreateExam = () => {
     const [questions, setQuestions] = useState([]);
     const [shuffleQuestions, setShuffleQuestions] = useState(false);
     const [shuffleAnswers, setShuffleAnswers] = useState(false);
+    const [duration, setDuration] = useState('');
 
     const getAnswerLabel = (index) => String.fromCharCode(65 + index); // 65 = 'A'
 
     const handleCreateExam = async (e) => {
         e.preventDefault();
+        const durationInMinutes = parseInt(duration);
+        const start = new Date(startTime);
+        const end = new Date(endTime);
+        if (isNaN(durationInMinutes) || durationInMinutes <= 0) {
+            alert('Thời gian làm bài phải là số nguyên dương (phút)');
+            return;
+        }
+        if (end <= start) {
+            alert('Thời gian kết thúc phải sau thời gian bắt đầu');
+            return;
+        }
         try {
             const res = await axios.post('http://localhost:5000/api/exams/create', {
                 title,
                 startTime,
-                endTime
+                endTime,
+                duration: durationInMinutes, // Gửi duration bằng phút
             });
             setExamId(res.data._id);
             setExamCode(res.data.code);
             setQuestions([{ content: '', answers: [{ content: '', isCorrect: false }], media: null, mediaURL: null, mediaType: null, isEditing: true }]);
             alert(`Exam created with code: ${res.data.code}`);
         } catch (error) {
-            alert(error.response.data.message);
+            alert(error.response?.data?.message || 'Error creating exam');
         }
     };
 
@@ -151,12 +164,12 @@ const CreateExam = () => {
             <h2 className="exam-title">Tạo bài kiểm tra</h2>
             {!examId ? (
                 <form onSubmit={handleCreateExam} className="exam-form">                    <input
-                        type="text"
-                        placeholder="Nhập tiêu đề bài kiểm tra"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        required
-                    />
+                    type="text"
+                    placeholder="Nhập tiêu đề bài kiểm tra"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    required
+                />
                     <input
                         type="datetime-local"
                         value={startTime}
@@ -170,15 +183,25 @@ const CreateExam = () => {
                         onChange={(e) => setEndTime(e.target.value)}
                         required
                         placeholder="Thời gian kết thúc"
-                    /><button type="submit" className="btn btn-primary">
+                    />
+                    <input
+                        type="number"
+                        placeholder="Duration (minutes)"
+                        value={duration}
+                        onChange={(e) => setDuration(e.target.value)}
+                        required
+                        min="1"
+                        step="1"
+                    />
+                    <button type="submit" className="btn btn-primary">
                         <i className="fas fa-plus-circle"></i> Tạo bài kiểm tra
                     </button>
                 </form>
             ) : (
                 <div>                    <div className="exam-code">
-                        <h3>Mã bài kiểm tra:</h3>
-                        <span className="exam-code-value">{examCode}</span>
-                    </div>
+                    <h3>Mã bài kiểm tra:</h3>
+                    <span className="exam-code-value">{examCode}</span>
+                </div>
                     {questions.map((question, index) => (
                         <div
                             key={index}
@@ -189,12 +212,12 @@ const CreateExam = () => {
                             </div>
                             {question.isEditing ? (
                                 <div className="question-content">                                    <input
-                                        type="text"
-                                        className="question-input"
-                                        placeholder="Nhập nội dung câu hỏi"
-                                        value={question.content}
-                                        onChange={(e) => handleUpdateQuestion(index, 'content', e.target.value)}
-                                    /><div className="file-input-container">
+                                    type="text"
+                                    className="question-input"
+                                    placeholder="Nhập nội dung câu hỏi"
+                                    value={question.content}
+                                    onChange={(e) => handleUpdateQuestion(index, 'content', e.target.value)}
+                                /><div className="file-input-container">
                                         <label className="file-input-label">
                                             <i className="fas fa-cloud-upload-alt"></i>
                                             <input
@@ -263,12 +286,12 @@ const CreateExam = () => {
                                         ))}
                                     </div>
                                     <div className="action-buttons">                                        <button
-                                            type="button"
-                                            className="btn btn-primary"
-                                            onClick={() => handleAddAnswer(index)}
-                                        >
-                                            <i className="fas fa-plus"></i> Thêm đáp án
-                                        </button>
+                                        type="button"
+                                        className="btn btn-primary"
+                                        onClick={() => handleAddAnswer(index)}
+                                    >
+                                        <i className="fas fa-plus"></i> Thêm đáp án
+                                    </button>
                                         <button
                                             type="button"
                                             className="btn btn-success"

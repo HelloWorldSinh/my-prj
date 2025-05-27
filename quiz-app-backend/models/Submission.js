@@ -10,7 +10,8 @@ const submissionSchema = new mongoose.Schema({
         },
     ],
     score: { type: Number },
-    submittedAt: { type: Date, default: Date.now }
+    submittedAt: { type: Date, default: Date.now },
+    timeUsed: { type: Number }, // Thời gian làm bài (giây)
 });
 
 module.exports = mongoose.model('Submission', submissionSchema);

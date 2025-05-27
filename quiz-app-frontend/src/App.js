@@ -11,7 +11,8 @@ import Result from './components/Result';
 import ExamList from './components/ExamList';
 import HomePage from './components/HomePage';
 import SelectRole from './components/SelectRole';
-
+//import EditExam from './components/EditExam';
+import SubmissionList from './components/SubmissionList';
 
 const DashboardRedirect = () => {
   const location = useLocation();
@@ -65,15 +66,16 @@ const App = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/select-role" element={<SelectRole />} /> {/* Add this */}
+        <Route path="/select-role" element={<SelectRole />} />
         <Route path="/dashboard" element={<DashboardRedirect />} />
         <Route path="/student" element={<StudentDashboard />} />
         <Route path="/teacher" element={<TeacherDashboard />} />
         <Route path="/create-exam" element={<CreateExam />} />
         <Route path="/exam/:code" element={<Exam />} />
         <Route path="/result/:examId" element={<Result />} />
-        <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/exam-list" element={<ExamList />} />
+        {/* <Route path="/exams/edit/:examId" element={<EditExam />} /> */}
+        <Route path="/submissons-list" element={<SubmissionList />} />
       </Routes>
     </Router>
   );

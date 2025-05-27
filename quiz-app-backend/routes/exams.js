@@ -23,15 +23,24 @@ const upload = multer({ storage });
 
 router.post('/create', auth, async (req, res) => {
     if (req.user.role !== 'teacher') return res.status(403).json({ message: 'Only teachers can create exams' });
-    const { title, startTime, endTime } = req.body;
+    const { title, startTime, endTime, duration } = req.body;
     try {
+        const start = new Date(startTime);
+        const end = new Date(endTime);
+        if (end <= start) {
+            return res.status(400).json({ message: 'End time must be after start time' });
+        }
+        if (!duration || isNaN(duration) || duration <= 0 || !Number.isInteger(Number(duration))) {
+            return res.status(400).json({ message: 'Duration must be a positive integer (in minutes)' });
+        }
         const code = Math.random().toString(36).substring(2, 8).toUpperCase();
         const exam = new Exam({
             code,
             title,
             teacherId: req.user.id,
             startTime,
-            endTime
+            endTime,
+            duration,
         });
         await exam.save();
         res.status(201).json(exam);
@@ -80,6 +89,16 @@ router.get('/teacher', auth, async (req, res) => {
     try {
         const exams = await Exam.find({ teacherId: req.user.id }).select('code title startTime endTime');
         res.json(exams);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.get('/id/:examId', auth, async (req, res) => {
+    try {
+        const exam = await Exam.findById(req.params.examId).populate('questions');
+        if (!exam) return res.status(404).json({ message: 'Exam not found' });
+        res.json(exam);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

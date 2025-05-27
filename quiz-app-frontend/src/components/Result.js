@@ -20,12 +20,19 @@ const Result = () => {
 
     if (!result || !result.exam || !result.submission) return <div>Loading...</div>;
 
+    let timeUsedStr = '';
+    if (result.submission.timeUsed !== undefined) {
+        const minutes = Math.floor(result.submission.timeUsed / 60);
+        const seconds = result.submission.timeUsed % 60;
+        timeUsedStr = `${minutes} phút ${seconds} giây`;
+    }
+
     return (
         <div>
             <h2>Result</h2>
             <p>Score: {result.submission.score}/{result.exam.questions.length}</p>
+            {timeUsedStr && <p>Thời gian làm bài: {timeUsedStr}</p>}
             {result.exam.questions.map((question, index) => {
-                // Tìm đáp án của học sinh cho câu hỏi này dựa trên questionId
                 const submissionAnswer = result.submission.answers.find(
                     ans => ans.questionId === question._id
                 );

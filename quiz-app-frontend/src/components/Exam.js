@@ -1,7 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Exam.css';
+
+const formatVietnamTime = (utcDate) =>
+    new Intl.DateTimeFormat('vi-VN', {
+        timeZone: 'Asia/Ho_Chi_Minh',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false
+    }).format(new Date(utcDate));
 
 const Exam = () => {
     const { code } = useParams();
@@ -11,10 +19,15 @@ const Exam = () => {
     const [shuffledQuestions, setShuffledQuestions] = useState([]);
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [timeUsed, setTimeUsed] = useState(0);
+    const [timeLeft, setTimeLeft] = useState(0);
+    const timerRef = useRef();
 
     const [violationCount, setViolationCount] = useState(0);
     const [showAlert, setShowAlert] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
+
+
 
     // Hàm trộn mảng (Fisher-Yates shuffle)
     const shuffleArray = (array) => {
@@ -30,15 +43,29 @@ const Exam = () => {
         const fetchExam = async () => {
             setLoading(true);
             try {
-                // Bật toàn màn hình
-                if (document.documentElement.requestFullscreen) {
-                    await document.documentElement.requestFullscreen();
-                }
                 const res = await axios.get(`http://localhost:5000/api/exams/${code}`);
-                let questions = res.data.questions;
+                const now = new Date();
+                const start = new Date(res.data.startTime);
+                const end = new Date(res.data.endTime);
 
-                // Thêm chỉ số gốc cho mỗi đáp án
-                questions = questions.map(q => ({
+                // Kiểm tra thời gian truy cập
+                if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                    alert('Thời gian bài thi không hợp lệ!');
+                    navigate('/');
+                    return;
+                }
+                if (now < start) {
+                    alert('Bài thi chưa bắt đầu!');
+                    navigate('/');
+                    return;
+                }
+                if (now > end) {
+                    alert('Bài thi đã kết thúc!');
+                    navigate('/');
+                    return;
+                }
+
+                let questions = res.data.questions.map(q => ({
                     ...q,
                     answers: q.answers.map((ans, idx) => ({
                         ...ans,
@@ -46,12 +73,9 @@ const Exam = () => {
                     })),
                 }));
 
-                // Trộn câu hỏi nếu shuffleQuestions = true
                 if (res.data.shuffleQuestions) {
                     questions = shuffleArray(questions);
                 }
-
-                // Trộn đáp án nếu shuffleAnswers = true
                 if (res.data.shuffleAnswers) {
                     questions = questions.map(q => ({
                         ...q,
@@ -62,14 +86,59 @@ const Exam = () => {
                 setExam(res.data);
                 setShuffledQuestions(questions);
                 setAnswers(questions.map(() => null));
+
+                // Kiểm tra duration
+                const duration = Number(res.data.duration);
+                if (!duration || isNaN(duration) || duration <= 0) {
+                    console.warn('Invalid duration, using default 40 minutes');
+                    alert('Thời gian làm bài không hợp lệ, sử dụng mặc định 40 phút.');
+                }
+
+                // Khởi tạo timer từ duration
+                const durationInSeconds = (duration || 40) * 60;
+                const timeToEnd = Math.floor((end - now) / 1000);
+                const timeRemaining = Math.min(durationInSeconds, timeToEnd); // Bắt đầu từ duration, giới hạn bởi endTime
+
+                console.log({
+                    durationMinutes: duration || 40,
+                    durationSeconds: durationInSeconds,
+                    timeToEndSeconds: timeToEnd,
+                    timeLeftSeconds: timeRemaining,
+                    now: now.toISOString(),
+                    start: start.toISOString(),
+                    end: end.toISOString(),
+                    code: res.data.code
+                });
+
+                setTimeLeft(timeRemaining);
+                setTimeUsed(0); // Bắt đầu từ 0
                 setLoading(false);
             } catch (error) {
-                alert(error.response.data.message);
+                alert(error.response?.data?.message || 'Lỗi tải bài thi');
                 setLoading(false);
+                navigate('/');
             }
         };
         fetchExam();
-    }, [code]);
+    }, [code, navigate]);
+
+    useEffect(() => {
+        if (loading || timeLeft <= 0) return;
+
+        timerRef.current = setInterval(() => {
+            setTimeLeft(prev => {
+                if (prev <= 1) {
+                    clearInterval(timerRef.current);
+                    handleSubmit(true); // Tự động nộp
+                    return 0;
+                }
+                return prev - 1;
+            });
+            setTimeUsed(prev => prev + 1);
+        }, 1000);
+
+        return () => clearInterval(timerRef.current);
+    }, [loading, timeLeft]);
 
     // Phát hiện chuyển tab 
     useEffect(() => {
@@ -85,7 +154,6 @@ const Exam = () => {
                 });
             }
         };
-
         document.addEventListener('visibilitychange', handleVisibilityChange);
         return () => {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -113,6 +181,7 @@ const Exam = () => {
         };
     }, []);
 
+
     const handleConfirmCheating = () => {
         navigate(`/result/${exam._id}`);
     };
@@ -123,8 +192,8 @@ const Exam = () => {
         setAnswers(newAnswers);
     };
 
-    const handleSubmit = async () => {
-        if (!window.confirm('Bạn có chắc chắn muốn nộp bài không?')) {
+    const handleSubmit = async (auto = false) => {
+        if (!auto && !window.confirm('Bạn có chắc chắn muốn nộp bài không?')) {
             return;
         }
 
@@ -145,6 +214,7 @@ const Exam = () => {
             const submission = {
                 examId: exam._id,
                 answers: submissionAnswers,
+                timeUsed
             };
             await axios.post('http://localhost:5000/api/submissions', submission);
             navigate(`/result/${exam._id}`);
@@ -177,6 +247,11 @@ const Exam = () => {
             total: shuffledQuestions.length
         };
     };
+    const formatTime = (seconds) => {
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    };
 
     if (loading) {
         return (
@@ -201,6 +276,13 @@ const Exam = () => {
     return (
         <div className="exam-container">
             <h2 className="exam-title">{exam.title}</h2>
+            <div className="exam-times">
+                <p>Bắt đầu: {formatVietnamTime(exam.startTime)}</p>
+                <p>Kết thúc: {formatVietnamTime(exam.endTime)}</p>
+            </div>
+            <div className="timer">
+                Thời gian còn lại: <span style={{ color: timeLeft < 60 ? 'red' : 'inherit', fontWeight: 'bold' }}>{formatTime(timeLeft)}</span>
+            </div>
             <p style={{ color: 'red' }}>Số lần vi phạm: {violationCount} / 3</p>            <div className="progress-container">
                 <div className="progress-info">
                     <div className="progress-label">Tiến độ làm bài:</div>
@@ -298,7 +380,7 @@ const Exam = () => {
                     Câu tiếp theo <i className="fas fa-chevron-right"></i>
                 </button>
             </div>            {!isLocked && (
-                <button className="submit-button" onClick={handleSubmit}>
+                <button className="submit-button" onClick={() => handleSubmit(false)}>
                     <i className="fas fa-paper-plane"></i> Nộp bài thi
                 </button>
             )}{showAlert && (
@@ -315,9 +397,6 @@ const Exam = () => {
                     </div>
                 </div>
             )}
-            {/* <button className="submit-button" onClick={handleSubmit}>
-                Nộp bài
-            </button> */}
         </div>
     );
 };

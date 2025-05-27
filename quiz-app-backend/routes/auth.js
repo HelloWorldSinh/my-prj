@@ -30,7 +30,7 @@ router.get(
         const token = jwt.sign(
             { id: user._id, role: user.role },
             process.env.JWT_SECRET,
-            { expiresIn: "30m" }
+            { expiresIn: "2m" }
         );
         console.log("Google callback - Redirecting to dashboard with:", {
             token,
@@ -54,7 +54,7 @@ router.post("/set-role", async (req, res) => {
         const token = jwt.sign(
             { id: user._id, role: user.role },
             process.env.JWT_SECRET,
-            { expiresIn: "30m" }
+            { expiresIn: "2m" }
         );
         res.status(200).json({ token, role: user.role });
     } catch (error) {
