@@ -3,20 +3,20 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const Result = () => {
-    const { examId } = useParams();
+    const { examId, submissionId } = useParams();
     const [result, setResult] = useState(null);
 
     useEffect(() => {
         const fetchResult = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/api/submissions/${examId}`);
+                const res = await axios.get(`http://localhost:5000/api/submissions/${examId}/${submissionId}`);
                 setResult(res.data);
             } catch (error) {
                 alert(error.response?.data?.message || 'Error fetching result');
             }
         };
         fetchResult();
-    }, [examId]);
+    }, [examId, submissionId]);
 
     if (!result || !result.exam || !result.submission) return <div>Loading...</div>;
 

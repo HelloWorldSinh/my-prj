@@ -158,7 +158,7 @@ main {
   right: 0;
   width: 100%;
   height: 100%;
-  background-image: url('../assets/logo-watermark.svg');
+  background-image: url('../../assets/logo-watermark.svg');
   background-repeat: no-repeat;
   background-position: right -100px top -50px;
   background-size: 500px;
@@ -320,7 +320,7 @@ main {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('../assets/logo-watermark.svg');
+  background-image: url('../../assets/logo-watermark.svg');
   background-repeat: no-repeat;
   background-position: left -100px bottom -50px;
   background-size: 400px;
@@ -477,7 +477,8 @@ main {
     margin-top: 15px;
   }
 
-  .login-btn, .register-btn {
+  .login-btn,
+  .register-btn {
     width: 100%;
     margin-right: 0;
     margin-bottom: 10px;

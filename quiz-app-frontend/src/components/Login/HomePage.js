@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './HomePage.css';
-import Logo from './Logo';
-import HeroIllustration from './HeroIllustration';
+import '../CSS/HomePage.css';
+import Logo from '../Logo';
+import HeroIllustration from '../HeroIllustration';
 
 const HomePage = () => {
   return (
@@ -10,8 +10,8 @@ const HomePage = () => {
       <header className="homepage-header">
         <div className="container">
           <div className="navbar">            <div className="logo">
-              <Logo size="medium" withText={true} />
-            </div>
+            <Logo size="medium" withText={true} />
+          </div>
             <nav className="main-nav">
               <ul>
                 <li><Link to="/">Trang chủ</Link></li>
@@ -91,8 +91,8 @@ const HomePage = () => {
       <footer className="homepage-footer">
         <div className="container">
           <div className="footer-content">            <div className="footer-logo">
-              <Logo size="small" withText={true} />
-            </div>
+            <Logo size="small" withText={true} />
+          </div>
             <div className="footer-links">
               <div className="footer-column">
                 <h4>Sản phẩm</h4>

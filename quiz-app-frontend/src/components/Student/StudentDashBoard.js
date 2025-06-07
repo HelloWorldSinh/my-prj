@@ -1,9 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { AuthContext } from "../context/AuthContext";
-import "./Dashboard.css";
-import logo from "../assets/logo.svg";
+import { AuthContext } from "../../context/AuthContext";
+import "../CSS/Dashboard.css";
+import logo from "../../assets/logo.svg";
 
 const StudentDashboard = () => {
     const [code, setCode] = useState("");
@@ -41,14 +41,40 @@ const StudentDashboard = () => {
 
         setIsLoading(true);
         try {
-            const res = await axios.get(`http://localhost:5000/api/exams/${code}`);
-            navigate(`/exam/${res.data.code}`);
+            // First, check if the exam exists
+            const examRes = await axios.get(
+                `http://localhost:5000/api/exams/${code}`
+            );
+
+
+            // Check if the student has already submitted this exam
+            const submissionRes = await axios.get(
+                `http://localhost:5000/api/submissions/check-submission/${code}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                }
+            );
+
+            if (submissionRes.data.hasSubmitted) {
+                alert("Bạn đã thi bài này rồi!");
+                navigate("/student"); // Redirect to dashboard
+                return;
+            }
+
+            // If no submission exists, proceed to the exam
+            navigate(`/exam/${examRes.data.code}`);
         } catch (error) {
-            alert(error.response?.data?.message || "Không tìm thấy bài kiểm tra với mã này");
+            alert(
+                error.response?.data?.message ||
+                "Không tìm thấy bài kiểm tra với mã này"
+            );
         } finally {
             setIsLoading(false);
         }
     };
+
 
     const handleLogout = async () => {
         await logout(navigate);
@@ -80,7 +106,8 @@ const StudentDashboard = () => {
                     <h3><i className="fas fa-pen"></i> Tham gia bài kiểm tra</h3>
                 </div>
                 <div className="card-body">
-                    <p>Nhập mã bài kiểm tra để bắt đầu làm bài</p>                    <form onSubmit={handleJoin} className="join-form">
+                    <p>Nhập mã bài kiểm tra để bắt đầu làm bài</p>
+                    <form onSubmit={handleJoin} className="join-form">
                         <div className="input-group code-input-group">
                             <i className="fas fa-key"></i>
                             <input

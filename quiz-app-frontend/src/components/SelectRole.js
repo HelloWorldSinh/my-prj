@@ -27,7 +27,7 @@ const SelectRole = () => {
         user: JSON.stringify({ role: res.data.role }),
       }); // Debug
       alert("Bạn đã đăng kí thành công, chuyển hướng qua trang đăng nhập");
-      navigate("/dashboard");
+      navigate("/login");
     } catch (error) {
       console.error(
         "SelectRole - Error setting role:",

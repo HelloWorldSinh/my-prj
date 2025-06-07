@@ -51,14 +51,18 @@ router.post('/create', auth, async (req, res) => {
 
 router.patch('/:examId', auth, async (req, res) => {
     if (req.user.role !== 'teacher') return res.status(403).json({ message: 'Only teachers can update exams' });
-    const { shuffleQuestions, shuffleAnswers } = req.body;
+    const { shuffleQuestions, shuffleAnswers, title, startTime, endTime, duration } = req.body;
     try {
         const exam = await Exam.findById(req.params.examId);
         if (!exam) return res.status(404).json({ message: 'Exam not found' });
         if (exam.teacherId.toString() !== req.user.id) return res.status(403).json({ message: 'Unauthorized' });
 
-        exam.shuffleQuestions = shuffleQuestions || false;
-        exam.shuffleAnswers = shuffleAnswers || false;
+        exam.title = title || exam.title;
+        exam.startTime = startTime ? new Date(startTime) : exam.startTime;
+        exam.endTime = endTime ? new Date(endTime) : exam.endTime;
+        exam.duration = duration || exam.duration;
+        exam.shuffleQuestions = shuffleQuestions !== undefined ? shuffleQuestions : exam.shuffleQuestions;
+        exam.shuffleAnswers = shuffleAnswers !== undefined ? shuffleAnswers : exam.shuffleAnswers;
         await exam.save();
         res.json(exam);
     } catch (error) {
@@ -70,6 +74,10 @@ router.post('/questions', auth, upload.single('media'), async (req, res) => {
     if (req.user.role !== 'teacher') return res.status(403).json({ message: 'Only teachers can add questions' });
     const { examId, content, answers } = req.body;
     try {
+        const exam = await Exam.findById(examId);
+        if (!exam) return res.status(404).json({ message: 'Exam not found' });
+        if (exam.teacherId.toString() !== req.user.id) return res.status(403).json({ message: 'Unauthorized' });
+
         const question = new Question({
             examId,
             content,
@@ -79,6 +87,51 @@ router.post('/questions', auth, upload.single('media'), async (req, res) => {
         await question.save();
         await Exam.findByIdAndUpdate(examId, { $push: { questions: question._id } });
         res.status(201).json(question);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.patch('/questions/:questionId', auth, upload.single('media'), async (req, res) => {
+    if (req.user.role !== 'teacher') return res.status(403).json({ message: 'Only teachers can update questions' });
+    const { content, answers } = req.body;
+    try {
+        const question = await Question.findById(req.params.questionId);
+        if (!question) return res.status(404).json({ message: 'Question not found' });
+        const exam = await Exam.findById(question.examId);
+        if (!exam) return res.status(404).json({ message: 'Exam not found' });
+        if (exam.teacherId.toString() !== req.user.id) return res.status(403).json({ message: 'Unauthorized' });
+
+        question.content = content || question.content;
+        question.answers = answers ? JSON.parse(answers) : question.answers;
+        if (req.file) {
+            if (question.media) {
+                fs.unlinkSync(path.join(__dirname, '..', question.media)); // Xóa media cũ
+            }
+            question.media = `/uploads/${req.file.filename}`;
+        }
+        await question.save();
+        res.json(question);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.delete('/questions/:questionId', auth, async (req, res) => {
+    if (req.user.role !== 'teacher') return res.status(403).json({ message: 'Only teachers can delete questions' });
+    try {
+        const question = await Question.findById(req.params.questionId);
+        if (!question) return res.status(404).json({ message: 'Question not found' });
+        const exam = await Exam.findById(question.examId);
+        if (!exam) return res.status(404).json({ message: 'Exam not found' });
+        if (exam.teacherId.toString() !== req.user.id) return res.status(403).json({ message: 'Unauthorized' });
+
+        if (question.media) {
+            fs.unlinkSync(path.join(__dirname, '..', question.media)); // Xóa file media
+        }
+        await Question.findByIdAndDelete(req.params.questionId);
+        await Exam.findByIdAndUpdate(question.examId, { $pull: { questions: req.params.questionId } });
+        res.json({ message: 'Question deleted successfully' });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -122,6 +175,12 @@ router.delete('/:examId', auth, async (req, res) => {
         if (exam.teacherId.toString() !== req.user.id) return res.status(403).json({ message: 'Unauthorized' });
 
         // Xóa tất cả câu hỏi liên quan đến bài thi
+        const questions = await Question.find({ examId: req.params.examId });
+        for (const question of questions) {
+            if (question.media) {
+                fs.unlinkSync(path.join(__dirname, '..', question.media));
+            }
+        }
         await Question.deleteMany({ examId: req.params.examId });
         // Xóa bài thi
         await Exam.findByIdAndDelete(req.params.examId);

@@ -38,7 +38,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 router.get('/:examId', auth, async (req, res) => {
-    if (req.user.role !== 'student') return res.status(403).json({ message: 'Only students can view submissions' });
+    if (req.user.role !== 'student') return res.status(403).json({ message: 'Only students can view submission' });
     try {
         const submission = await Submission.findOne({ examId: req.params.examId, studentId: req.user.id });
         if (!submission) return res.status(404).json({ message: 'Submission not found' });
@@ -51,7 +51,7 @@ router.get('/:examId', auth, async (req, res) => {
 
 // New route to get all submissions for a student
 router.get('/', auth, async (req, res) => {
-    if (req.user.role !== 'student') return res.status(403).json({ message: 'Only students can view submissions' });
+    if (req.user.role !== 'student') return res.status(403).json({ message: 'Only students can view submission' });
     try {
         const submissions = await Submission.find({ studentId: req.user.id })
             .populate({
@@ -71,5 +71,70 @@ router.get('/', auth, async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
+
+router.get("/exam/:examId", auth, async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ message: "User not authenticated" });
+        }
+        if (!req.params.examId.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json({ message: "Invalid exam ID format" });
+        }
+        const submissions = await Submission.find({ examId: req.params.examId })
+            .populate("studentId", "email") // Populate studentId with email field
+            .populate("examId", "title") // Optional: populate examId
+            .lean();
+        if (!submissions || submissions.length === 0) {
+            return res
+                .status(404)
+                .json({ message: "No submissions found for this exam" });
+        }
+        res.json(submissions);
+    } catch (error) {
+        console.error("Error fetching submissions for exam:", error);
+        res
+            .status(500)
+            .json({ message: "Internal server error", error: error.message });
+    }
+});
+
+//endpoint để lấy submission từ giáo viên để xem details
+router.get('/:examId/:submissionId', auth, async (req, res) => {
+    try {
+        const submission = await Submission.findOne({
+            _id: req.params.submissionId,
+            examId: req.params.examId
+        });
+        if (!submission) return res.status(404).json({ message: 'Submission not found' });
+        const exam = await Exam.findById(req.params.examId).populate('questions');
+        if (!exam) return res.status(404).json({ message: 'Exam not found' });
+        res.json({ submission, exam });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.get("/check-submission/:examCode", auth, async (req, res) => {
+    if (req.user.role !== "student")
+        return res
+            .status(403)
+            .json({ message: "Only students can check submissions" });
+    try {
+        const exam = await Exam.findOne({
+            code: { $regex: `^${req.params.examCode}$`, $options: "i" },
+        });
+        if (!exam) return res.status(404).json({ message: "Exam not found" });
+
+        const existingSubmission = await Submission.findOne({
+            examId: exam._id,
+            studentId: req.user.id,
+        });
+
+        res.json({ hasSubmitted: !!existingSubmission });
+    } catch (error) {
+        res.status(500).json({ message: "Error checking submission" });
+    }
+});
+
 
 module.exports = router;

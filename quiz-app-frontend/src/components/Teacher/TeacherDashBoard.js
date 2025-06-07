@@ -1,8 +1,8 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
-import "./Dashboard.css";
-import logo from "../assets/logo.svg";
+import { AuthContext } from "../../context/AuthContext";
+import "../CSS/Dashboard.css";
+import logo from "../../assets/logo.svg";
 
 const TeacherDashboard = () => {
     const [userName, setUserName] = useState("Giáo viên");
@@ -19,6 +19,10 @@ const TeacherDashboard = () => {
     const { user, logout } = useContext(AuthContext);
 
     useEffect(() => {
+        if (!user || !localStorage.getItem('token')) {
+            navigate('/login');
+            return;
+        }
         // Cập nhật thời gian hiện tại
         const updateTime = () => {
             const now = new Date();
@@ -33,7 +37,7 @@ const TeacherDashboard = () => {
             const emailName = user.email.split("@")[0];
             setUserName(emailName);
         }
-    }, [user]);
+    }, [user, navigate]);
 
     const handleCreateExam = () => {
         navigate("/create-exam");

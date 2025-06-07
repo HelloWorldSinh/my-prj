@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const SubmissionList = () => {
     const [submissions, setSubmissions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchSubmissions = async () => {
@@ -20,6 +22,7 @@ const SubmissionList = () => {
             } catch (err) {
                 setError(err.response?.data?.message || 'Error fetching submissions');
                 setLoading(false);
+                navigate('/login');
             }
         };
         fetchSubmissions();
@@ -57,7 +60,7 @@ const SubmissionList = () => {
                                 </td>
                                 <td className="py-2 px-4 border-b">
                                     <Link
-                                        to={`/result/${sub.examId}`}
+                                        to={`/result/${sub.id}`}
                                         className="text-blue-500 hover:underline"
                                     >
                                         Xem chi tiết

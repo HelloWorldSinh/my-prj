@@ -1,18 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { AuthContext } from './context/AuthContext';
-import Login from './components/Login';
-import Register from './components/Register';
-import StudentDashboard from './components/StudentDashBoard';
-import TeacherDashboard from './components/TeacherDashBoard';
-import CreateExam from './components/CreateExam';
-import Exam from './components/Exam';
+import { AuthContext, AuthProvider } from './context/AuthContext';
+import Login from './components/Login/Login';
+import Register from './components/Login/Register';
+import StudentDashboard from './components/Student/StudentDashBoard';
+import TeacherDashboard from './components/Teacher/TeacherDashBoard';
+import CreateExam from './components/Teacher/CreateExam';
+import Exam from './components/Student/Exam';
 import Result from './components/Result';
-import ExamList from './components/ExamList';
-import HomePage from './components/HomePage';
+import ExamList from './components/Teacher/ExamList';
+import HomePage from './components/Login/HomePage';
 import SelectRole from './components/SelectRole';
-//import EditExam from './components/EditExam';
-import SubmissionList from './components/SubmissionList';
+import EditExam from './components/Teacher/EditExam';
+import SubmissionList from './components/Student/SubmissionList';
+import ExamDetails from './components/Teacher/ExamDetails';
 
 const DashboardRedirect = () => {
   const location = useLocation();
@@ -61,23 +62,27 @@ const DashboardRedirect = () => {
 
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/select-role" element={<SelectRole />} />
-        <Route path="/dashboard" element={<DashboardRedirect />} />
-        <Route path="/student" element={<StudentDashboard />} />
-        <Route path="/teacher" element={<TeacherDashboard />} />
-        <Route path="/create-exam" element={<CreateExam />} />
-        <Route path="/exam/:code" element={<Exam />} />
-        <Route path="/result/:examId" element={<Result />} />
-        <Route path="/exam-list" element={<ExamList />} />
-        {/* <Route path="/exams/edit/:examId" element={<EditExam />} /> */}
-        <Route path="/submissons-list" element={<SubmissionList />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/select-role" element={<SelectRole />} />
+          <Route path="/dashboard" element={<DashboardRedirect />} />
+          <Route path="/student" element={<StudentDashboard />} />
+          <Route path="/teacher" element={<TeacherDashboard />} />
+          <Route path="/create-exam" element={<CreateExam />} />
+          <Route path="/exam/:code" element={<Exam />} />
+          <Route path="/result/:examId" element={<Result />} />
+          <Route path="/exam-list" element={<ExamList />} />
+          <Route path="/submissons-list" element={<SubmissionList />} />
+          <Route path="/exams/edit/:examId" element={<EditExam />} />
+          <Route path="/exams/details/:examId" element={<ExamDetails />} />
+          <Route path="/exam/result/:examId/:submissionId" element={<Result />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 };
 

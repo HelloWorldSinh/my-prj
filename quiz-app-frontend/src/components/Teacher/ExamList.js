@@ -21,6 +21,7 @@ const ExamList = () => {
             } catch (err) {
                 setError(err.response?.data?.message || 'Error fetching exams');
                 setLoading(false);
+                navigate("/login");
             }
         };
 
@@ -41,6 +42,13 @@ const ExamList = () => {
             setError(err.response?.data?.message || 'Error deleting exam');
         }
     };
+
+    const handleViewDetails = (examId) => {
+        // Navigate to a details page (to be implemented later)
+        navigate(`/exams/details/${examId}`);
+    };
+
+
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
@@ -67,6 +75,14 @@ const ExamList = () => {
                                 <td>{exam.code}</td>
                                 <td>{new Date(exam.startTime).toLocaleString()}</td>
                                 <td>{new Date(exam.endTime).toLocaleString()}</td>
+                                <td>
+                                    <button
+                                        onClick={() => handleViewDetails(exam._id)}
+                                        style={{ color: 'blue', cursor: 'pointer' }}
+                                    >
+                                        View Detail
+                                    </button>
+                                </td>
                                 <td>
                                     <button
                                         onClick={() => navigate(`/exams/edit/${exam._id}`)}

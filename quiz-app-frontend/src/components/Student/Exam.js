@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './Exam.css';
+import '../CSS/Exam.css';
 
 const formatVietnamTime = (utcDate) =>
     new Intl.DateTimeFormat('vi-VN', {
