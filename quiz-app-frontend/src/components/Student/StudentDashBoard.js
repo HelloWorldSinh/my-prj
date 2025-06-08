@@ -45,8 +45,6 @@ const StudentDashboard = () => {
             const examRes = await axios.get(
                 `http://localhost:5000/api/exams/${code}`
             );
-
-
             // Check if the student has already submitted this exam
             const submissionRes = await axios.get(
                 `http://localhost:5000/api/submissions/check-submission/${code}`,

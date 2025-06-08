@@ -76,10 +76,10 @@ const App = () => {
           <Route path="/exam/:code" element={<Exam />} />
           <Route path="/result/:examId" element={<Result />} />
           <Route path="/exam-list" element={<ExamList />} />
-          <Route path="/submissons-list" element={<SubmissionList />} />
+          <Route path="/submissions-list" element={<SubmissionList />} />
           <Route path="/exams/edit/:examId" element={<EditExam />} />
           <Route path="/exams/details/:examId" element={<ExamDetails />} />
-          <Route path="/exam/result/:examId/:submissionId" element={<Result />} />
+          <Route path="/result/:examId/:submissionId" element={<Result />} />
         </Routes>
       </Router>
     </AuthProvider>

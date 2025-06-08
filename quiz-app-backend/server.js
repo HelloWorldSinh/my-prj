@@ -1,5 +1,4 @@
 require("dotenv").config();
-
 const express = require("express");
 const passport = require("passport");
 const cors = require("cors");
@@ -8,7 +7,6 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/auth");
 const examRoutes = require("./routes/exams");
 const submissionRoutes = require("./routes/submissions");
-
 // Initialize the app
 const app = express();
 
@@ -38,7 +36,6 @@ app.use(passport.session()); // Thêm passport.session() để hỗ trợ sessio
 app.use("/api/auth", authRoutes);
 app.use("/api/exams", examRoutes);
 app.use("/api/submissions", submissionRoutes);
-
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

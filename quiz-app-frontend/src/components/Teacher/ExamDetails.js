@@ -77,7 +77,7 @@ const ExamDetails = () => {
             "submissionId:",
             submissionId
         );
-        navigate(`/exam/result/${examId}/${submissionId}`);
+        navigate(`/result/${examId}/${submissionId}`);
     };
 
 

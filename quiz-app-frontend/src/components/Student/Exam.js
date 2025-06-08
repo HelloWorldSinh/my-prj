@@ -216,8 +216,9 @@ const Exam = () => {
                 answers: submissionAnswers,
                 timeUsed
             };
-            await axios.post('http://localhost:5000/api/submissions', submission);
-            navigate(`/result/${exam._id}`);
+            const res = await axios.post('http://localhost:5000/api/submissions', submission);
+            const { submissionId } = res.data;
+            navigate(`/result/${exam._id}/${submissionId}`);
         } catch (error) {
             alert(error.response.data.message);
         }

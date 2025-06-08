@@ -60,7 +60,7 @@ const SubmissionList = () => {
                                 </td>
                                 <td className="py-2 px-4 border-b">
                                     <Link
-                                        to={`/result/${sub.id}`}
+                                        to={`/result/${sub.examId}/${sub._id}`}
                                         className="text-blue-500 hover:underline"
                                     >
                                         Xem chi tiết
