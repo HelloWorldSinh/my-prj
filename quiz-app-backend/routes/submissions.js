@@ -130,7 +130,6 @@ router.get("/exam/:examId", auth, async (req, res) => {
 
 //endpoint để lấy submission từ giáo viên để xem details
 router.get('/:examId/:submissionId', auth, async (req, res) => {
-    console.log("oi doi oi");
     try {
         const submission = await Submission.findOne({
             _id: req.params.submissionId,
