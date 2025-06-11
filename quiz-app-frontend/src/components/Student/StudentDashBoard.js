@@ -333,10 +333,9 @@ const StudentDashboard = () => {
                     >
                         <i className="fas fa-home"></i>
                         <span>Trang chủ</span>
-                    </div>
-                    <div
+                    </div>                    <div
                         className={`menu-item ${activeTab === "history" ? "active" : ""}`}
-                        onClick={() => setActiveTab("history")}
+                        onClick={() => navigate('/submissions-list')}
                     >
                         <i className="fas fa-clipboard-list"></i>
                         <span>Bài kiểm tra đã làm</span>

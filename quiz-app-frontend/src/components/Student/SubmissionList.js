@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import '../CSS/SubmissionList.css';
+import { FaSearch, FaArrowLeft, FaClipboardCheck, FaClock, FaCalendarAlt } from 'react-icons/fa';
 
 const SubmissionList = () => {
     const [submissions, setSubmissions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -26,51 +28,113 @@ const SubmissionList = () => {
             }
         };
         fetchSubmissions();
-    }, []);
+    }, [navigate]);
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
-    if (submissions.length === 0) return <div>No submissions found.</div>;
+    const handleBack = () => {
+        navigate('/student');
+    };
+
+    const getScoreClass = (score, total) => {
+        const percentage = (score / total) * 100;
+        if (percentage >= 80) return 'score-high';
+        if (percentage >= 50) return 'score-medium';
+        return 'score-low';
+    };
+
+    const filteredSubmissions = submissions.filter(sub => 
+        sub.examTitle.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
-        <div className="container mx-auto p-4">
-            <h2 className="text-2xl font-bold mb-4">Danh sách bài thi đã làm</h2>
-            <table className="min-w-full bg-white border border-gray-300">
-                <thead>
-                    <tr>
-                        <th className="py-2 px-4 border-b">Tên bài thi</th>
-                        <th className="py-2 px-4 border-b">Thời gian làm bài</th>
-                        <th className="py-2 px-4 border-b">Số câu đúng</th>
-                        <th className="py-2 px-4 border-b">Ngày nộp</th>
-                        <th className="py-2 px-4 border-b">Chi tiết</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {submissions.map((sub) => {
-                        const minutes = Math.floor(sub.timeUsed / 60);
-                        const seconds = sub.timeUsed % 60;
-                        const timeUsedStr = `${minutes} phút ${seconds} giây`;
-                        return (
-                            <tr key={sub.examId}>
-                                <td className="py-2 px-4 border-b">{sub.examTitle}</td>
-                                <td className="py-2 px-4 border-b">{timeUsedStr}</td>
-                                <td className="py-2 px-4 border-b">{sub.score}/{sub.totalQuestions}</td>
-                                <td className="py-2 px-4 border-b">
-                                    {new Date(sub.submittedAt).toLocaleDateString('vi-VN')}
-                                </td>
-                                <td className="py-2 px-4 border-b">
-                                    <Link
-                                        to={`/result/${sub.examId}/${sub._id}`}
-                                        className="text-blue-500 hover:underline"
-                                    >
-                                        Xem chi tiết
-                                    </Link>
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+        <div className="submissions-list-container">
+            <div className="submissions-list-header">
+                <h1 className="submissions-list-title">Bài kiểm tra đã làm</h1>
+                <button className="back-button" onClick={handleBack}>
+                    <FaArrowLeft /> Quay lại trang chủ
+                </button>
+            </div>
+
+            <div className="submissions-search-bar">
+                <div className="search-input-container">
+                    <input
+                        type="text"
+                        placeholder="Tìm kiếm bài kiểm tra..."
+                        className="search-input"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <FaSearch className="search-icon" />
+                </div>
+            </div>
+
+            {loading ? (
+                <div className="no-submissions">
+                    <FaClipboardCheck />
+                    <p>Đang tải dữ liệu...</p>
+                </div>
+            ) : error ? (
+                <div className="no-submissions">
+                    <p>Lỗi: {error}</p>
+                </div>
+            ) : filteredSubmissions.length === 0 ? (
+                <div className="no-submissions">
+                    <FaClipboardCheck />
+                    <p>{searchTerm ? 'Không tìm thấy bài kiểm tra phù hợp.' : 'Bạn chưa làm bài kiểm tra nào.'}</p>
+                </div>
+            ) : (
+                <table className="submissions-table">
+                    <thead>
+                        <tr>
+                            <th>Tên bài kiểm tra</th>
+                            <th>Thời gian làm bài</th>
+                            <th>Điểm số</th>
+                            <th>Ngày nộp</th>
+                            <th>Chi tiết</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredSubmissions.map((sub) => {
+                            const minutes = Math.floor(sub.timeUsed / 60);
+                            const seconds = sub.timeUsed % 60;
+                            const timeUsedStr = `${minutes} phút ${seconds} giây`;
+                            const scoreClass = getScoreClass(sub.score, sub.totalQuestions);
+                            
+                            return (
+                                <tr key={sub._id}>
+                                    <td>{sub.examTitle}</td>
+                                    <td>
+                                        <div className="flex items-center gap-2">
+                                            <FaClock style={{ color: 'var(--accent-color)' }} />
+                                            {timeUsedStr}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="score-cell">
+                                            <span className={`score-badge ${scoreClass}`}>
+                                                {sub.score}/{sub.totalQuestions}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="flex items-center gap-2">
+                                            <FaCalendarAlt style={{ color: 'var(--text-light)' }} />
+                                            {new Date(sub.submittedAt).toLocaleDateString('vi-VN')}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <Link
+                                            to={`/result/${sub.examId}/${sub._id}`}
+                                            className="view-details-button"
+                                        >
+                                            Xem chi tiết
+                                        </Link>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            )}
         </div>
     );
 };

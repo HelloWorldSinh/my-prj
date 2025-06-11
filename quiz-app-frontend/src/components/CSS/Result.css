@@ -1,0 +1,321 @@
+/* Result.css */
+:root {
+  --primary-color: #ff4f9f;
+  --primary-hover: #e63c8a;
+  --secondary-color: #b83dba;
+  --accent-color: #6a3093;
+  --background-color: #f9f9f9;
+  --card-color: #ffffff;
+  --border-color: #eaeaea;
+  --text-color: #333333;
+  --text-light: #777777;
+  --success-color: #38c172;
+  --warning-color: #f6993f;
+  --danger-color: #e3342f;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+.result-container {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--card-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  animation: fadeIn 0.5s ease;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.result-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-color);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.back-button:hover {
+  background-color: var(--border-color);
+}
+
+.result-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.summary-card {
+  flex: 1;
+  min-width: 180px;
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  background-color: var(--background-color);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.summary-card-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+}
+
+.summary-card h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  color: var(--text-light);
+}
+
+.summary-card p {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.summary-card.primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+}
+
+.summary-card.primary h3, .summary-card.primary p, .summary-card.primary .summary-card-icon {
+  color: white;
+}
+
+.questions-list {
+  margin-top: 2rem;
+}
+
+.question-card {
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: var(--border-radius);
+  background-color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid var(--primary-color);
+}
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.question-number {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-light);
+  background-color: var(--background-color);
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.question-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.status-correct {
+  color: var(--success-color);
+}
+
+.status-incorrect {
+  color: var(--danger-color);
+}
+
+.question-content {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-color);
+  margin-bottom: 1.5rem;
+}
+
+.question-media {
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.question-media img {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: var(--border-radius);
+}
+
+.question-media audio {
+  width: 100%;
+}
+
+.answers-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.answer-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+}
+
+.answer-item:last-child {
+  margin-bottom: 0;
+}
+
+.answer-item:hover {
+  background-color: rgba(255, 79, 159, 0.05);
+}
+
+.answer-item.correct {
+  background-color: rgba(56, 193, 114, 0.1);
+  border-color: var(--success-color);
+}
+
+.answer-item.incorrect {
+  background-color: rgba(227, 52, 47, 0.1);
+  border-color: var(--danger-color);
+}
+
+.answer-item.user-selected {
+  border-width: 2px;
+}
+
+.answer-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.answer-marker.correct {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.answer-marker.incorrect {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.answer-marker.default {
+  background-color: var(--border-color);
+  color: var(--text-light);
+}
+
+.answer-content {
+  flex-grow: 1;
+}
+
+.answer-status {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.answer-status.correct {
+  color: var(--success-color);
+}
+
+.answer-status.incorrect {
+  color: var(--danger-color);
+}
+
+.share-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-top: 2rem;
+}
+
+.share-button:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .result-container {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+  
+  .result-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .summary-card {
+    min-width: 100%;
+  }
+  
+  .question-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}

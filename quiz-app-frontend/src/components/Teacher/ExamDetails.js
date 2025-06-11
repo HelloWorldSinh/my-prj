@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import "../CSS/ExamDetails.css";
+import { FaArrowLeft, FaSearch, FaCalendarAlt, FaUser, FaClock, FaFileAlt, FaUsers } from "react-icons/fa";
 
 
 const ExamDetails = () => {
@@ -9,6 +11,7 @@ const ExamDetails = () => {
     const [submissions, setSubmissions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [searchTerm, setSearchTerm] = useState("");
     const navigate = useNavigate();
 
 
@@ -79,77 +82,154 @@ const ExamDetails = () => {
         );
         navigate(`/result/${examId}/${submissionId}`);
     };
+    const handleBack = () => {
+        navigate('/exam-list');
+    };
 
+    const getScoreClass = (score, total) => {
+        const percentage = (score / total) * 100;
+        if (percentage >= 80) return 'score-high';
+        if (percentage >= 50) return 'score-medium';
+        return 'score-low';
+    };
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
+    const filteredSubmissions = submissions.filter(sub => 
+        sub.studentId?.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (loading) return (
+        <div className="exam-details-container">
+            <div className="no-submissions">
+                <i className="fas fa-spinner fa-spin"></i>
+                <p>Đang tải dữ liệu...</p>
+            </div>
+        </div>
+    );
+    
+    if (error) return (
+        <div className="exam-details-container">
+            <div className="no-submissions">
+                <i className="fas fa-exclamation-triangle"></i>
+                <p>Lỗi: {error}</p>
+                <button className="back-button" onClick={handleBack}>
+                    <FaArrowLeft /> Quay lại danh sách đề thi
+                </button>
+            </div>
+        </div>
+    );
 
 
     return (
-        <div>
-            <h2>Exam Details</h2>
-            {submissions.length === 0 ? (
-                <p>No submissions found for this exam.</p>
-            ) : (
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Exam Title</th>
-                            <th>Email</th>
-                            <th>Total Questions</th>
-                            <th>Correct Answers</th>
-                            <th>Start Time</th>
-                            <th>Submission Time</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {submissions.map((submission) => {
-                            const startTime = new Date(
-                                new Date(submission.submittedAt).getTime() -
-                                submission.timeUsed * 1000
-                            );
-                            const correctAnswers = submission.answers.reduce(
-                                (count, answer) => {
-                                    const question = exam.questions.find(
-                                        (q) => q._id.toString() === answer.questionId.toString()
-                                    );
-                                    if (
-                                        question &&
-                                        question.answers[answer.selectedAnswer]?.isCorrect
-                                    ) {
-                                        return count + 1;
-                                    }
-                                    return count;
-                                },
-                                0
-                            );
+        <div className="exam-details-container">
+            <div className="exam-details-header">
+                <h1 className="exam-details-title">Chi tiết bài kiểm tra</h1>
+                <button className="back-button" onClick={handleBack}>
+                    <FaArrowLeft /> Quay lại danh sách đề thi
+                </button>
+            </div>
 
+            {exam && (
+                <div className="exam-info">
+                    <div className="info-card primary">
+                        <h4>Tên bài kiểm tra</h4>
+                        <p>{exam.title}</p>
+                    </div>
+                    <div className="info-card">
+                        <h4>Mã bài kiểm tra</h4>
+                        <p>{exam.code}</p>
+                    </div>
+                    <div className="info-card">
+                        <h4>Số câu hỏi</h4>
+                        <p>{exam.questions.length}</p>
+                    </div>
+                    <div className="info-card">
+                        <h4>Số lượt làm bài</h4>
+                        <p>{submissions.length}</p>
+                    </div>
+                </div>
+            )}
 
-                            return (
+            <div className="submissions-section">
+                <div className="submissions-search-bar">
+                    <div className="search-input-container">
+                        <input
+                            type="text"
+                            placeholder="Tìm kiếm theo email học viên..."
+                            className="search-input"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <FaSearch className="search-icon" />
+                    </div>
+                </div>
+
+                {filteredSubmissions.length === 0 ? (
+                    <div className="no-submissions">
+                        <i className="fas fa-clipboard-list"></i>
+                        <p>{searchTerm ? 'Không tìm thấy bài nộp phù hợp.' : 'Chưa có bài nộp nào cho đề thi này.'}</p>
+                    </div>
+                ) : (
+                    <table className="submissions-table">
+                        <thead>
+                            <tr>
+                                <th>Email học viên</th>
+                                <th>Điểm số</th>
+                                <th>Thời gian làm</th>
+                                <th>Bắt đầu</th>
+                                <th>Nộp bài</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredSubmissions.map((submission) => {
+                                const startTime = new Date(
+                                    new Date(submission.submittedAt).getTime() -
+                                    submission.timeUsed * 1000
+                                );
+                                const correctAnswers = submission.answers.reduce(
+                                    (count, answer) => {
+                                        const question = exam.questions.find(
+                                            (q) => q._id.toString() === answer.questionId.toString()
+                                        );
+                                        if (
+                                            question &&
+                                            question.answers[answer.selectedAnswer]?.isCorrect
+                                        ) {
+                                            return count + 1;
+                                        }
+                                        return count;
+                                    },
+                                    0
+                                );
+                                
+                                const minutes = Math.floor(submission.timeUsed / 60);
+                                const seconds = submission.timeUsed % 60;
+                                const timeUsedStr = `${minutes} phút ${seconds} giây`;
+                                const scoreClass = getScoreClass(correctAnswers, exam.questions.length);                            return (
                                 <tr key={submission._id}>
-                                    <td>{exam.title}</td>
                                     <td>{submission.studentId.email}</td>
-                                    <td>{exam.questions.length}</td>
-                                    <td>{correctAnswers}</td>
-                                    <td>{startTime.toLocaleString()}</td>
-                                    <td>{new Date(submission.submittedAt).toLocaleString()}</td>
+                                    <td>
+                                        <div className="score-cell">
+                                            <span className={`score-badge ${scoreClass}`}>
+                                                {correctAnswers}/{exam.questions.length}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td>{timeUsedStr}</td>
+                                    <td>{startTime.toLocaleString('vi-VN')}</td>
+                                    <td>{new Date(submission.submittedAt).toLocaleString('vi-VN')}</td>
                                     <td>
                                         <button
                                             onClick={() => handleViewDetails(submission._id)}
-                                            style={{
-                                                color: "green",
-                                                cursor: "pointer",
-                                                marginRight: "10px",
-                                            }}
+                                            className="action-button details"
                                         >
-                                            Details
+                                            Xem chi tiết
                                         </button>
                                         <button
                                             onClick={() => handleDeleteSubmission(submission._id)}
-                                            style={{ color: "red", cursor: "pointer" }}
+                                            className="action-button delete"
                                         >
-                                            Delete
+                                            Xóa
                                         </button>
                                     </td>
                                 </tr>
@@ -157,7 +237,8 @@ const ExamDetails = () => {
                         })}
                     </tbody>
                 </table>
-            )}
+                )}
+            </div>
         </div>
     );
 };
