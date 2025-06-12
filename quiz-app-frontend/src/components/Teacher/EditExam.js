@@ -231,6 +231,16 @@ const EditExam = () => {
             }
         }
     };
+    const handleCancel = () => {
+        if (window.confirm('Bạn có chắc muốn hủy bỏ? Mọi thay đổi sẽ không được lưu.')) {
+            questions.forEach(q => {
+                if (q.mediaURL && !q._id) {
+                    URL.revokeObjectURL(q.mediaURL);
+                }
+            });
+            navigate('/exam-list');
+        }
+    };
 
     if (loading) return <div>Loading...</div>;
 
@@ -425,9 +435,14 @@ const EditExam = () => {
                     <i className="fas fa-random"></i> Trộn đáp án
                 </label>
             </div>
-            <button onClick={handleSaveChanges} className="complete-btn">
-                <i className="fas fa-save"></i> Lưu thay đổi
-            </button>
+            <div>
+                <button onClick={handleCancel} className="cancel-btn">
+                    <i className="fas fa-times"></i> Hủy bỏ
+                </button>
+                <button onClick={handleSaveChanges} className="complete-btn">
+                    <i className="fas fa-save"></i> Lưu thay đổi
+                </button>
+            </div>
         </div>
     );
 };
