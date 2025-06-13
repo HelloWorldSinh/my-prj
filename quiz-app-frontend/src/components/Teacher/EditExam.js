@@ -434,8 +434,7 @@ const EditExam = () => {
                     />
                     <i className="fas fa-random"></i> Trộn đáp án
                 </label>
-            </div>
-            <div>
+            </div>            <div className="buttons-container">
                 <button onClick={handleCancel} className="cancel-btn">
                     <i className="fas fa-times"></i> Hủy bỏ
                 </button>

@@ -519,6 +519,74 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* Button container */
+.buttons-container {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+/* Cancel button */
+.cancel-btn {
+  flex: 1;
+  padding: 1.2rem;
+  background: linear-gradient(135deg, var(--danger-color) 0%, #f05545 100%);
+  color: white;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 12px rgba(227, 52, 47, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.5px;
+}
+
+.cancel-btn i {
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+.cancel-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, transparent 75%, transparent);
+  background-size: 20px 20px;
+  z-index: 1;
+  opacity: 0.2;
+}
+
+.cancel-btn:hover {
+  background: linear-gradient(135deg, #f05545 0%, var(--danger-color) 100%);
+  box-shadow: 0 6px 18px rgba(227, 52, 47, 0.4);
+  transform: translateY(-3px);
+}
+
+.cancel-btn:hover i {
+  transform: scale(1.2);
+  transition: transform 0.3s ease;
+}
+
+.cancel-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Update complete button in the container context */
+.buttons-container .complete-btn {
+  flex: 1;
+  margin-top: 0;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .exam-form {
