@@ -1,6 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthContext, AuthProvider } from './context/AuthContext';
+import axios from 'axios';
+
+// Import các component
 import Login from './components/Login/Login';
 import Register from './components/Login/Register';
 import StudentDashboard from './components/Student/StudentDashBoard';
@@ -14,6 +17,47 @@ import SelectRole from './components/SelectRole';
 import EditExam from './components/Teacher/EditExam';
 import SubmissionList from './components/Student/SubmissionList';
 import ExamDetails from './components/Teacher/ExamDetails';
+import TeacherRoute from './components/TeacherRoute';
+import MonitoringPage from './components/Teacher/MonitoringPage';
+
+
+// =================================================================
+// === CẤU HÌNH AXIOS TOÀN CỤC (HOÀN CHỈNH) ===
+
+// 1. Interceptor cho REQUEST (Tự động đính kèm token VÀO MỌI YÊU CẦU)
+axios.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Nếu có token, tự động thêm vào header Authorization
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config; // Gửi request đi với config đã được cập nhật
+  },
+  error => {
+    return Promise.reject(error);
+  }
+);
+
+// 2. Interceptor cho RESPONSE (Xử lý khi token hết hạn)
+axios.interceptors.response.use(
+  response => {
+    // Nếu response thành công, không làm gì cả
+    return response;
+  },
+  error => {
+    // Nếu có lỗi trả về
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      if (window.location.pathname !== '/login') {
+        alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+        window.location.href = '/login'; 
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 const DashboardRedirect = () => {
   const location = useLocation();
@@ -80,6 +124,8 @@ const App = () => {
           <Route path="/exams/edit/:examId" element={<EditExam />} />
           <Route path="/exams/details/:examId" element={<ExamDetails />} />
           <Route path="/result/:examId/:submissionId" element={<Result />} />
+
+           <Route path="/monitor/exam/:examId" element={<TeacherRoute><MonitoringPage /></TeacherRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

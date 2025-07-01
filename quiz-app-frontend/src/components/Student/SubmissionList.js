@@ -77,7 +77,7 @@ const SubmissionList = () => {
                     <p>Lỗi: {error}</p>
                 </div>
             ) : filteredSubmissions.length === 0 ? (
-                <div className="no-submissions">
+<div className="no-submissions">
                     <FaClipboardCheck />
                     <p>{searchTerm ? 'Không tìm thấy bài kiểm tra phù hợp.' : 'Bạn chưa làm bài kiểm tra nào.'}</p>
                 </div>
@@ -132,7 +132,7 @@ const SubmissionList = () => {
                                 </tr>
                             );
                         })}
-                    </tbody>
+</tbody>
                 </table>
             )}
         </div>

@@ -20,12 +20,13 @@
 }
 
 .app-logo span {
-  background: linear-gradient(to right, #ff4f9f, #b83dba);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   font-weight: 800;
   letter-spacing: -0.5px;
+  /* Thêm class blue-gradient-text để sử dụng từ colors.css */
 }
 
 /* Size variations */

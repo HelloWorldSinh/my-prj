@@ -70,7 +70,7 @@ const TeacherDashboard = () => {
         <>
             {/* Stats Cards */}
             <div className="stats-cards">
-                <div className="stat-card">
+                <div className="stat-card blue-card">
                     <div className="stat-icon blue">
                         <i className="fas fa-file-alt"></i>
                     </div>
@@ -80,7 +80,7 @@ const TeacherDashboard = () => {
                     </div>
                 </div>
 
-                <div className="stat-card">
+                <div className="stat-card blue-card">
                     <div className="stat-icon green">
                         <i className="fas fa-check-circle"></i>
                     </div>
@@ -90,7 +90,7 @@ const TeacherDashboard = () => {
                     </div>
                 </div>
 
-                <div className="stat-card">
+                <div className="stat-card blue-card">
                     <div className="stat-icon purple">
                         <i className="fas fa-users"></i>
                     </div>
@@ -103,17 +103,15 @@ const TeacherDashboard = () => {
 
             {/* Recent Exams */}
             <div className="exams-section">
-                <h3><i className="fas fa-clipboard-list"></i> Danh sách bài kiểm tra gần đây</h3>
+                <div className="section-header">
+                    <h3><i className="fas fa-clipboard-list"></i> Danh sách bài kiểm tra gần đây</h3>
+                    <button className="create-exam-btn blue-button" onClick={handleCreateExam}>
+                        <i className="fas fa-plus"></i> Tạo bài kiểm tra mới
+                    </button>
+                </div>
                 <div className="no-exams">
                     <i className="far fa-clipboard"></i>
                     <p>Chưa có bài kiểm tra nào</p>
-                    <button className="btn btn-primary create-exam-btn" onClick={handleCreateExam}>
-                        <span className="btn-content">
-                            <i className="fas fa-plus animated-icon"></i>
-                            <span>Tạo bài kiểm tra mới</span>
-                        </span>
-                        <span className="btn-shine"></span>
-                    </button>
                 </div>
             </div>
         </>
@@ -124,21 +122,13 @@ const TeacherDashboard = () => {
         <div className="exams-section">
             <h3><i className="fas fa-clipboard-list"></i> Quản lý bài kiểm tra</h3>
             <div className="exam-actions">
-                <button className="btn btn-primary create-exam-btn" onClick={handleCreateExam}>
-                    <span className="btn-content">
-                        <i className="fas fa-plus animated-icon"></i>
-                        <span>Tạo bài kiểm tra mới</span>
-                    </span>
-                    <span className="btn-shine"></span>
-                </button>
-
                 <div className="search-bar">
                     <i className="fas fa-search"></i>
                     <input type="text" placeholder="Tìm kiếm bài kiểm tra..." />
                 </div>
 
                 <div className="filter-dropdown">
-                    <button className="btn btn-secondary">
+                    <button className="btn btn-secondary blue-button">
                         <i className="fas fa-filter"></i> Lọc
                     </button>
                 </div>
@@ -288,8 +278,8 @@ const TeacherDashboard = () => {
                 </div>
 
                 <div className="form-actions">
-                    <button className="btn btn-secondary">Hủy thay đổi</button>
-                    <button className="btn btn-primary">Lưu thay đổi</button>
+                    <button className="btn btn-secondary blue-button">Hủy thay đổi</button>
+                    <button className="btn btn-primary blue-button">Lưu thay đổi</button>
                 </div>
             </div>
         </div>
@@ -349,13 +339,7 @@ const TeacherDashboard = () => {
                         <h2>Xin chào, {userName}!</h2>
                         <p>{currentTime}</p>
                     </div>
-                    <div className="header-actions">                        <button className="btn btn-create create-exam-btn" onClick={handleCreateExam}>
-                        <span className="btn-content">
-                            <i className="fas fa-plus animated-icon"></i>
-                            <span>Tạo bài kiểm tra mới</span>
-                        </span>
-                        <span className="btn-shine"></span>
-                    </button>
+                    <div className="header-actions">
                         <div className="user-profile" onClick={toggleProfileDropdown}>
                             <div className="avatar">
                                 {userName.charAt(0).toUpperCase()}

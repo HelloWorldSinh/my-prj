@@ -1,388 +1,367 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../CSS/Exam.css';
 
-// Hàm định dạng thời gian theo múi giờ Việt Nam, có kiểm tra tính hợp lệ
+// Hàm định dạng thời gian theo múi giờ Việt Nam
 const formatVietnamTime = (utcDate) => {
-  const date = new Date(utcDate);
-  if (isNaN(date.getTime())) return 'Thời gian không hợp lệ';
-  return new Intl.DateTimeFormat('vi-VN', {
-    timeZone: 'Asia/Ho_Chi_Minh',
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit', second: '2-digit',
-    hour12: false
-  }).format(date);
+    const date = new Date(utcDate);
+    if (isNaN(date.getTime())) return 'Thời gian không hợp lệ';
+    return new Intl.DateTimeFormat('vi-VN', {
+        timeZone: 'Asia/Ho_Chi_Minh',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false
+    }).format(date);
 };
 
 const Exam = () => {
-  const { code } = useParams();
-  const navigate = useNavigate();
-  const [exam, setExam] = useState(null);
-  const [answers, setAnswers] = useState([]);
-  const [shuffledQuestions, setShuffledQuestions] = useState([]);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [timeUsed, setTimeUsed] = useState(0);
-  const [violationCount, setviolationCount] = useState(0);
-  const [showAlert, setShowAlert] = useState(false);
-  const [isLocked, setIsLocked] = useState(false);
-  const timerRef = useRef();
-  const saveTimeoutRef = useRef();
+    const { code } = useParams();
+    const navigate = useNavigate();
+    const [exam, setExam] = useState(null);
+    const [answers, setAnswers] = useState([]);
+    const [shuffledQuestions, setShuffledQuestions] = useState([]);
+    const [currentQuestion, setCurrentQuestion] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [timeLeft, setTimeLeft] = useState(0);
+    const [timeUsed, setTimeUsed] = useState(0);
+    const [violationCount, setViolationCount] = useState(0);
+    const [showAlert, setShowAlert] = useState(false);
+    const [isLocked, setIsLocked] = useState(false);
+    const [submissionId, setSubmissionId] = useState(null);
+    const timerRef = useRef();
 
-  // Hàm trộn mảng câu hỏi/đáp án
-  const shuffleArray = (array) => {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
-  };
-
-  // Lưu trạng thái bài thi vào localStorage
-  const saveExamState = useCallback(() => {
-    if (!exam) return;
-    const state = {
-      answers,
-      timeLeft,
-      timeUsed,
-      shuffledQuestions,
-      examId: exam._id,
-      endTime: exam.endTime,
-      violationCount // lưu số lần vi phạm
+    // Hàm trộn mảng
+    const shuffleArray = (array) => {
+        const newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
     };
-    try {
-      localStorage.setItem(`exam_${code}`, JSON.stringify(state));
-    } catch (err) {
-      console.error('Error saving to localStorage:', err);
-    }
-  }, [exam, answers, timeLeft, timeUsed, shuffledQuestions, violationCount, code]);
 
-  // Xóa trạng thái cũ khỏi localStorage
-  const clearExamState = useCallback(() => {
-    try {
-      localStorage.removeItem(`exam_${code}`);
-    } catch (err) {
-      console.error('Error clearing localStorage:', err);
-    }
-  }, [code]);
+    // useEffect chính để tải và bắt đầu bài thi
+    useEffect(() => {
+        const fetchExam = async () => {
+            setLoading(true);
+            try {
+                const token = localStorage.getItem('token');
+                const res = await axios.get(`http://localhost:5000/api/exams/${code}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const examData = res.data;
 
-  // Tải trạng thái từ localStorage (nếu có)
-  const loadExamState = () => {
-    try {
-      const saved = localStorage.getItem(`exam_${code}`);
-      return saved ? JSON.parse(saved) : null;
-    } catch (err) {
-      console.error('Error loading from localStorage:', err);
-      return null;
-    }
-  };
+                const now = new Date();
+                const start = new Date(examData.startTime);
+                const end = new Date(examData.endTime);
 
-  // Gọi API lấy thông tin bài thi
-  useEffect(() => {
-    let mounted = true;
-    const fetchExam = async () => {
-      setLoading(true);
-      try {
-        const savedState = loadExamState();
-        const now = new Date();
+                if (now < start) {
+                    alert('Bài thi chưa bắt đầu!');
+                    navigate('/student');
+                    return;
+                }
+                if (now > end) {
+                    alert('Bài thi đã kết thúc!');
+                    navigate('/student');
+                    return;
+                }
 
-        if (savedState && new Date(savedState.endTime) > now) {
-          setExam({ _id: savedState.examId, endTime: savedState.endTime });
-          setAnswers(savedState.answers);
-          setShuffledQuestions(savedState.shuffledQuestions);
-          setTimeLeft(savedState.timeLeft);
-          setTimeUsed(savedState.timeUsed);
-          setviolationCount(savedState.violationCount || 0); // Lấy số lần vi phạm từ trạng thái lưu
-          setLoading(false);
-          return;
-        } else {
-          clearExamState();
+                // Gọi API /start để tạo hoặc lấy submission đã có
+                try {
+                    const startResponse = await axios.post(
+                        'http://localhost:5000/api/submissions/start',
+                        { examId: examData._id },
+                        { headers: { 'Authorization': `Bearer ${token}` } }
+                    );
+                    setSubmissionId(startResponse.data._id);
+                } catch (startError) {
+                    if (startError.response && startError.response.data.submission) {
+                        setSubmissionId(startError.response.data.submission._id);
+                    } else {
+                        throw new Error("Không thể bắt đầu phiên làm bài.");
+                    }
+                }
+
+                let processedQuestions = examData.questions.map((q) => ({
+                    ...q,
+                    answers: q.answers.map((ans, idx) => ({ ...ans, originalIndex: idx })),
+                }));
+                if (examData.shuffleQuestions) processedQuestions = shuffleArray(processedQuestions);
+                if (examData.shuffleAnswers) {
+                    processedQuestions = processedQuestions.map((q) => ({ ...q, answers: shuffleArray(q.answers) }));
+                }
+
+                setExam(examData);
+                setShuffledQuestions(processedQuestions);
+                setAnswers(processedQuestions.map(() => null));
+
+                const durationInSeconds = (Number(examData.duration) || 0) * 60;
+                const timeToEnd = Math.floor((end - now) / 1000);
+                setTimeLeft(Math.min(durationInSeconds, timeToEnd));
+                setTimeUsed(0);
+
+            } catch (error) {
+                alert(error.response?.data?.message || 'Lỗi tải bài thi');
+                navigate('/student');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchExam();
+    }, [code, navigate]);
+
+    // useEffect đếm ngược thời gian
+    useEffect(() => {
+        if (loading || timeLeft <= 0) return;
+
+        timerRef.current = setInterval(() => {
+            setTimeLeft((prev) => {
+                if (prev <= 1) {
+                    clearInterval(timerRef.current);
+                    handleSubmit(true);
+                    return 0;
+                }
+                return prev - 1;
+            });
+            setTimeUsed((prev) => prev + 1);
+        }, 1000);
+
+        return () => {
+            clearInterval(timerRef.current);
+        };
+    }, [loading, timeLeft]);
+
+    // useEffect xử lý vi phạm
+    useEffect(() => {
+        const reportViolationAPI = async () => {
+            if (!submissionId) return;
+            try {
+                const token = localStorage.getItem('token');
+                await axios.patch(
+                    `http://localhost:5000/api/submissions/report-violation/${submissionId}`,
+                    {}, { headers: { 'Authorization': `Bearer ${token}` } }
+                );
+            } catch (err) {
+                console.error("Failed to report violation:", err);
+            }
+        };
+
+        const handleViolation = () => {
+            setViolationCount((prev) => {
+                const newCount = prev + 1;
+                if (newCount >= 3) {
+                    setShowAlert(true); //hiện cảnh báo
+                    setIsLocked(true); // khóa giao diện
+
+                }
+                return newCount;
+            });
+            reportViolationAPI();
+        };
+
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                handleViolation();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, [submissionId]);
+
+
+    useEffect(() => {
+        // Nếu bài thi bị khóa do vi phạm
+        if (isLocked && showAlert) {
+            // Tạo một khoảng trễ 3 giây để người dùng đọc cảnh báo
+            const autoSubmitTimer = setTimeout(() => {
+                handleSubmit(true); // Sau 3 giây, tự động nộp bài
+            }, 3000);
+
+            // Dọn dẹp timer nếu component bị hủy
+            return () => clearTimeout(autoSubmitTimer);
+        }
+    }, [isLocked, showAlert]); // useEffect này sẽ chạy khi isLocked hoặc showAlert thay đổi
+
+    // Hàm xử lý khi chọn đáp án
+    const handleAnswer = (questionIndex, answerIndex) => {
+        if (isLocked) return;
+
+        if (submissionId) {
+            const token = localStorage.getItem('token');
+            const originalAnswerIndex = shuffledQuestions[questionIndex].answers[answerIndex].originalIndex;
+            axios.patch('http://localhost:5000/api/submissions/update-answer', {
+                submissionId,
+                questionId: shuffledQuestions[questionIndex]._id,
+                selectedAnswer: originalAnswerIndex,
+            }, { headers: { 'Authorization': `Bearer ${token}` } })
+                .catch(err => console.error("Update answer failed:", err));
         }
 
-        const res = await axios.get(`http://localhost:5000/api/exams/${code}`);
-        if (!mounted) return;
-
-        const { startTime, endTime, duration, questions, shuffleQuestions, shuffleAnswers } = res.data;
-        const start = new Date(startTime);
-        const end = new Date(endTime);
-
-        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-          alert('Thời gian bài thi không hợp lệ!');
-          navigate('/');
-          return;
-        }
-        if (now < start) {
-          alert('Bài thi chưa bắt đầu!');
-          navigate('/');
-          return;
-        }
-        if (now > end) {
-          alert('Bài thi đã kết thúc!');
-          navigate('/');
-          return;
-        }
-
-        // Xử lý câu hỏi/đáp án
-        let processedQuestions = questions.map((q) => ({
-          ...q,
-          answers: q.answers.map((ans, idx) => ({ ...ans, originalIndex: idx })),
-        }));
-        if (shuffleQuestions) processedQuestions = shuffleArray(processedQuestions);
-        if (shuffleAnswers) {
-          processedQuestions = processedQuestions.map((q) => ({
-            ...q,
-            answers: shuffleArray(q.answers),
-          }));
-        }
-
-        setExam(res.data);
-        setShuffledQuestions(processedQuestions);
-        setAnswers(processedQuestions.map(() => null));
-
-        const durationInSeconds = (Number(duration) || 40) * 60;
-        const timeToEnd = Math.floor((end - now) / 1000);
-        setTimeLeft(Math.min(durationInSeconds, timeToEnd));
-        setTimeUsed(0);
-      } catch (error) {
-        alert(error.response?.data?.message || 'Lỗi tải bài thi');
-        navigate('/');
-      } finally {
-        setLoading(false);
-      }
+        setAnswers((prev) => {
+            const newAnswers = [...prev];
+            newAnswers[questionIndex] = answerIndex;
+            return newAnswers;
+        });
     };
-    fetchExam();
-    return () => { mounted = false; };
-  }, [code, navigate, clearExamState]);
-  // gọi saveState mỗi khi có thay đổi
-  useEffect(() => {
-    saveExamState();
-  }, [violationCount, saveExamState]);
 
-  // Đếm ngược thời gian & lưu trạng thái định kỳ
-  useEffect(() => {
-    if (loading || timeLeft <= 0) return;
+    // Hàm xử lý nộp bài
+    const handleSubmit = async (auto = false) => {
+        if (!auto && !window.confirm('Bạn có chắc chắn muốn nộp bài không?')) return;
 
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timerRef.current);
-          clearInterval(saveTimeoutRef.current);
-          handleSubmit(true);
-          return 0;
+        setIsLocked(true); // Khóa không cho thao tác nữa
+        clearInterval(timerRef.current);
+
+        try {
+            const token = localStorage.getItem('token');
+            const submissionAnswers = shuffledQuestions.map((q, i) => ({
+                questionId: q._id,
+                selectedAnswer: answers[i] === null ? null : (exam.shuffleAnswers ? q.answers[answers[i]].originalIndex : answers[i]),
+            }));
+
+            const res = await axios.post('http://localhost:5000/api/submissions/submit', {
+                submissionId: submissionId,
+                answers: submissionAnswers,
+                timeUsed,
+            }, { headers: { 'Authorization': `Bearer ${token}` } });
+
+            alert(`Bạn đã nộp bài thành công! Điểm số: ${res.data.score}/${res.data.total}`);
+            navigate('/submissions-list');
+
+        } catch (error) {
+            alert(error.response?.data?.message || 'Lỗi nộp bài');
         }
-        return prev - 1;
-      });
-      setTimeUsed((prev) => prev + 1);
-    }, 1000);
-
-    saveTimeoutRef.current = setInterval(saveExamState, 5000);
-
-    return () => {
-      clearInterval(timerRef.current);
-      clearInterval(saveTimeoutRef.current);
     };
-  }, [loading, timeLeft, saveExamState]);
 
-  useEffect(() => {
-    window.addEventListener('beforeunload', saveExamState);
-    return () => window.removeEventListener('beforeunload', saveExamState);
-  }, [saveExamState]);
+    // Các hàm phụ trợ và JSX
+    const formatTime = (seconds) => {
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    };
 
-  // Phát hiện hành vi gian lận (chuyển tab/thoát toàn màn hình)
-  useEffect(() => {
-    const handleViolation = () => {
-      setviolationCount((prev) => {
-        const newCount = prev + 1;
-        if (newCount >= 3) {
-          setShowAlert(true);
-          setIsLocked(true);
+    const progress = () => {
+        if (!shuffledQuestions || shuffledQuestions.length === 0) {
+            return { percent: 0, answered: 0, total: 0 };
         }
-        return newCount;
-      });
+        const answeredCount = answers.filter((a) => a !== null).length;
+        return {
+            percent: (answeredCount / shuffledQuestions.length) * 100,
+            answered: answeredCount,
+            total: shuffledQuestions.length,
+        };
     };
-    const handleVisibilityChange = () => document.hidden && handleViolation();
-    const handleFullscreenChange = () => !document.fullscreenElement && handleViolation();
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    };
-  }, []);
+    if (loading) return <div className="loading-container"><div className="loading-spinner"></div>Đang tải bài thi...</div>;
 
-  const handleAnswer = (questionIndex, answerIndex) => {
-    setAnswers((prev) => {
-      const newAnswers = [...prev];
-      newAnswers[questionIndex] = answerIndex;
-      return newAnswers;
-    });
-  };
+    if (!exam || !shuffledQuestions.length) return <div className="loading-container">Không tìm thấy bài thi hoặc bài thi không có câu hỏi.</div>;
 
-  const handleSubmit = async (auto = false) => {
-    if (!auto && !window.confirm('Bạn có chắc chắn muốn nộp bài không?')) return;
-    clearInterval(timerRef.current);
-    clearInterval(saveTimeoutRef.current);
-    clearExamState();
-    try {
-      const submissionAnswers = shuffledQuestions.map((q, i) => ({
-        questionId: q._id,
-        selectedAnswer:
-          answers[i] === null ? null : exam.shuffleAnswers ? q.answers[answers[i]].originalIndex : answers[i],
-      }));
+    const currentQuestionData = shuffledQuestions[currentQuestion];
 
-      const res = await axios.post('http://localhost:5000/api/submissions', {
-        examId: exam._id,
-        answers: submissionAnswers,
-        timeUsed,
-      });
-      navigate(`/result/${exam._id}/${res.data.submissionId}`);
-    } catch (error) {
-      alert(error.response?.data?.message || 'Lỗi nộp bài');
-    }
-  };
-
-  const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-    const s = (seconds % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  };
-
-  const progress = () => {
-    const answeredCount = answers.filter((a) => a !== null).length;
-    return {
-      percent: (answeredCount / shuffledQuestions.length) * 100,
-      answered: answeredCount,
-      total: shuffledQuestions.length,
-    };
-  };
-
-  // Hiển thị loading hoặc lỗi bài thi
-  if (loading) return <div className="loading-container"><div className="loading-spinner"></div>Đang tải bài thi...</div>;
-  if (!exam || !shuffledQuestions.length)
-    return <div className="loading-container">Không tìm thấy bài thi hoặc bài thi không có câu hỏi.</div>;
-
-  const currentQuestionData = shuffledQuestions[currentQuestion];
-
-  return (
-    <div className="exam-container">
-      <h2 className="exam-title">{exam.title}</h2>
-      <div className="exam-times">
-        <p>Bắt đầu: {formatVietnamTime(exam.startTime)}</p>
-        <p>Kết thúc: {formatVietnamTime(exam.endTime)}</p>
-      </div>
-      <div className="timer">
-        Thời gian còn lại: <span style={{ color: timeLeft < 60 ? 'red' : 'inherit', fontWeight: 'bold' }}>{formatTime(timeLeft)}</span>
-      </div>
-      <p style={{ color: 'red' }}>Số lần vi phạm: {violationCount} / 3</p>
-
-      {/* Tiến độ làm bài */}
-      <div className="progress-container">
-        <div className="progress-info">
-          <div className="progress-label">Tiến độ làm bài:</div>
-          <div className="progress-text">
-            <i className="fas fa-check-circle"></i> Đã trả lời {progress().answered}/{progress().total} câu hỏi
-          </div>
-        </div>
-        <div className="progress-bar">
-          <div className="progress-fill" style={{ width: `${progress().percent}%` }}></div>
-        </div>
-      </div>
-
-      {/* Chuyển nhanh câu hỏi */}
-      <div className="pagination">
-        {shuffledQuestions.map((_, index) => (
-          <div
-            key={index}
-            className={`pagination-item ${index === currentQuestion ? 'active' : ''} ${answers[index] !== null ? 'answered' : ''}`}
-            onClick={() => setCurrentQuestion(index)}
-          >
-            {index + 1}
-          </div>
-        ))}
-      </div>
-
-      {/* Hiển thị câu hỏi */}
-      <div className="question-card">
-        <div className="question-header">
-          <i className="fas fa-question-circle"></i> Câu hỏi {currentQuestion + 1}/{shuffledQuestions.length}
-        </div>
-        <div className="question-content">
-          <div className="question-text">{currentQuestionData.content}</div>
-          {currentQuestionData.media && (
-            <div className="media-container">
-              {currentQuestionData.media.endsWith('.mp3') ? (
-                <audio className="audio-control" controls src={`http://localhost:5000${currentQuestionData.media}`} />
-              ) : (
-                <img className="question-image" src={`http://localhost:5000${currentQuestionData.media}`} alt="Hình ảnh câu hỏi" />
-              )}
+    return (
+        <div className={`exam-container ${isLocked ? 'locked' : ''}`}>
+            <h2 className="exam-title">{exam.title}</h2>
+            <div className="exam-times">
+                <p>Bắt đầu: {formatVietnamTime(exam.startTime)}</p>
+                <p>Kết thúc: {formatVietnamTime(exam.endTime)}</p>
             </div>
-          )}
+            <div className="timer">
+                Thời gian còn lại: <span style={{ color: timeLeft < 60 ? 'red' : 'inherit', fontWeight: 'bold' }}>{formatTime(timeLeft)}</span>
+            </div>
+            <p style={{ color: 'red' }}>Số lần vi phạm: {violationCount} / 3</p>
 
-          <div className="answers-container">
-            {currentQuestionData.answers.map((answer, aIndex) => (
-              <div
-                key={aIndex}
-                className={`answer-item ${answers[currentQuestion] === aIndex ? 'selected' : ''}`}
-                onClick={() => handleAnswer(currentQuestion, aIndex)}
-              >
-                <div className="answer-radio"></div>
-                <div className="answer-text">{answer.content}</div>
-                {answer.media && (
-                  <div className="answer-media">
-                    {answer.media.endsWith('.mp3') ? (
-                      <audio className="audio-control" controls src={`http://localhost:5000${answer.media}`} />
-                    ) : (
-                      <img src={`http://localhost:5000${answer.media}`} alt="Hình ảnh đáp án" style={{ maxWidth: '200px' }} />
+            <div className="progress-container">
+                <div className="progress-info">
+                    <div className="progress-label">Tiến độ làm bài:</div>
+                    <div className="progress-text">
+                        Đã trả lời {progress().answered}/{progress().total} câu hỏi
+                    </div>
+                </div>
+                <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: `${progress().percent}%` }}></div>
+                </div>
+            </div>
+
+            <div className="pagination">
+                {shuffledQuestions.map((_, index) => (
+                    <div
+                        key={index}
+                        className={`pagination-item ${index === currentQuestion ? 'active' : ''} ${answers[index] !== null ? 'answered' : ''}`}
+                        onClick={() => !isLocked && setCurrentQuestion(index)}
+                    >
+                        {index + 1}
+                    </div>
+                ))}
+            </div>
+
+            <div className="question-card">
+                <div className="question-header">
+                    Câu hỏi {currentQuestion + 1}/{shuffledQuestions.length}
+                </div>
+                <div className="question-content">
+                    <div className="question-text">{currentQuestionData.content}</div>
+                    {currentQuestionData.media && (
+                        <div className="media-container">
+                            {currentQuestionData.media.endsWith('.mp3') ? (
+                                <audio className="audio-control" controls src={`http://localhost:5000${currentQuestionData.media}`} />
+                            ) : (
+                                <img className="question-image" src={`http://localhost:5000${currentQuestionData.media}`} alt="Hình ảnh câu hỏi" />
+                            )}
+                        </div>
                     )}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Điều hướng câu hỏi */}
-      <div className="navigation-buttons">
-        <button className="nav-button prev" onClick={() => setCurrentQuestion((prev) => prev - 1)} disabled={currentQuestion === 0}>
-          <i className="fas fa-chevron-left"></i> Câu trước
-        </button>
-        <button
-          className="nav-button next"
-          onClick={() => setCurrentQuestion((prev) => prev + 1)}
-          disabled={currentQuestion === shuffledQuestions.length - 1}
-        >
-          Câu tiếp theo <i className="fas fa-chevron-right"></i>
-        </button>
-      </div>
-
-      {!isLocked && (
-        <button className="submit-button" onClick={() => handleSubmit(false)}>
-          <i className="fas fa-paper-plane"></i> Nộp bài thi
-        </button>
-      )}
-
-      {/* Hiển thị cảnh báo vi phạm */}
-      {showAlert && (
-        <div className="warning-dialog">
-          <div className="warning-content">
-            <div className="warning-icon">
-              <i className="fas fa-exclamation-triangle"></i>
+                    <div className="answers-container">
+                        {currentQuestionData.answers.map((answer, aIndex) => (
+                            <div
+                                key={aIndex}
+                                className={`answer-item ${answers[currentQuestion] === aIndex ? 'selected' : ''}`}
+                                onClick={() => handleAnswer(currentQuestion, aIndex)}
+                            >
+                                <div className="answer-radio"></div>
+                                <div className="answer-text">{answer.content}</div>
+                                {answer.media && (
+                                    <div className="answer-media">
+                                        {answer.media.endsWith('.mp3') ? (
+                                            <audio className="audio-control" controls src={`http://localhost:5000${answer.media}`} />
+                                        ) : (
+                                            <img src={`http://localhost:5000${answer.media}`} alt="Hình ảnh đáp án" style={{ maxWidth: '200px' }} />
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
-            <h2>Cảnh báo!</h2>
-            <p>Chuyển tab hoặc thoát màn hình quá 3 lần. Bài thi đã kết thúc.</p>
-            <button className="warning-button" onClick={() => navigate(`/result/${exam._id}`)}>
-              <i className="fas fa-check"></i> Xác nhận
-            </button>
-          </div>
+
+            <div className="navigation-buttons">
+                <button className="nav-button prev" onClick={() => setCurrentQuestion((prev) => prev - 1)} disabled={isLocked || currentQuestion === 0}>
+                    Câu trước
+                </button>
+                <button className="nav-button next" onClick={() => setCurrentQuestion((prev) => prev + 1)} disabled={isLocked || currentQuestion === shuffledQuestions.length - 1}>
+                    Câu tiếp theo
+                </button>
+            </div>
+
+            {!isLocked && (
+                <button className="submit-button" onClick={() => handleSubmit(false)}>
+                    Nộp bài thi
+                </button>
+            )}
+
+            {showAlert && (
+                <div className="warning-dialog">
+                    <div className="warning-content">
+                        <h2>Cảnh báo!</h2>
+                        <p>Bạn đã vi phạm quy chế thi quá 3 lần. Bài thi sẽ được tự động nộp.</p>
+                    </div>
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  );
+    );
 };
 
 export default Exam;

@@ -7,11 +7,24 @@ const submissionSchema = new mongoose.Schema({
         {
             questionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Question' },
             selectedAnswer: { type: Number },
+            _id: false
         },
     ],
     score: { type: Number },
-    submittedAt: { type: Date, default: Date.now },
-    timeUsed: { type: Number }, // Thời gian làm bài (giây)
+    status: {
+        type: String,
+        enum: ['in_progress', 'submitted'],
+        default: 'in_progress'
+    },
+    violationCount: {
+        type: Number,
+        default: 0
+    },
+    submittedAt: { type: Date },
+    timeUsed: { type: Number },
+    createdAt: { type: Date, default: Date.now }
 });
+
+submissionSchema.index({ examId: 1, studentId: 1 }, { unique: true });
 
 module.exports = mongoose.model('Submission', submissionSchema);

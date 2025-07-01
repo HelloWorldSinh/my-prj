@@ -1,21 +1,5 @@
 /* ExamList.css */
-:root {
-  --primary-color: #ff4f9f;
-  --primary-hover: #e63c8a;
-  --secondary-color: #b83dba;
-  --accent-color: #6a3093;
-  --background-color: #f9f9f9;
-  --card-color: #ffffff;
-  --border-color: #eaeaea;
-  --text-color: #333333;
-  --text-light: #777777;
-  --success-color: #38c172;
-  --warning-color: #f6993f;
-  --danger-color: #e3342f;
-  --border-radius: 8px;
-  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --transition: all 0.3s ease;
-}
+/* Biến màu được định nghĩa trong colors.css */
 
 .exam-list-container {
   max-width: 1200px;
@@ -48,14 +32,14 @@
   font-size: 2rem;
   font-weight: 700;
   color: var(--text-color);
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .create-exam-button {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  background: var(--gradient-primary);
   color: white;
   border: none;
   padding: 0.7rem 1.5rem;
@@ -66,16 +50,24 @@
   align-items: center;
   gap: 0.5rem;
   transition: var(--transition);
-  box-shadow: 0 2px 8px rgba(184, 61, 186, 0.3);
+  box-shadow: var(--box-shadow);
 }
 
 .create-exam-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(184, 61, 186, 0.5);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+/*trang giám sát*/
+.action-button.monitor-button {
+  background-color: #0d6efd; /* Blue */
+}
+
+.action-button.monitor-button:hover {
+  background-color: #0b5ed7;
 }
 
 .back-home-button {
-  background: linear-gradient(135deg, #6a3093 0%, #a044ff 100%);
+  background: var(--gradient-secondary);
   color: white;
   border: none;
   padding: 0.7rem 1.5rem;
@@ -86,12 +78,12 @@
   align-items: center;
   gap: 0.5rem;
   transition: var(--transition);
-  box-shadow: 0 2px 8px rgba(106, 48, 147, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 120, 212, 0.3);
 }
 
 .back-home-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(106, 48, 147, 0.5);
+  box-shadow: 0 4px 12px rgba(0, 120, 212, 0.5);
 }
 
 .exam-filter-section {

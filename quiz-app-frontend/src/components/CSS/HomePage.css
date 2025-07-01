@@ -1,20 +1,7 @@
 /* HomePage.css */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 
-:root {
-  --primary-color: #ff4f9f;
-  --primary-light: #ff85a2;
-  --primary-dark: #e63c8a;
-  --accent-color: #b83dba;
-  --text-color: #333;
-  --light-bg: #fff;
-  --light-gray: #f8e6f0;
-  --gradient-primary: linear-gradient(to right, #ff4f9f, #ff85a2);
-  --gradient-accent: linear-gradient(to right, #b83dba, #ff4f9f);
-  --box-shadow: 0 4px 15px rgba(255, 79, 159, 0.15);
-  --border-radius: 10px;
-  --transition: all 0.3s ease;
-}
+/* Biến màu được định nghĩa trong colors.css */
 
 * {
   margin: 0;

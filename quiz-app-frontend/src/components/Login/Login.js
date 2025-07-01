@@ -32,7 +32,7 @@ const Login = () => {
                 <div className="login-form">
                     <h2>Đăng Nhập</h2>
                     <p>Đăng nhập bằng tài khoản Google để truy cập ứng dụng</p>                    <div className="google-login-container">
-                        <button onClick={handleGoogleLogin} className="btn btn-google" disabled={isLoading}>
+                        <button onClick={handleGoogleLogin} className="btn btn-google blue-border" disabled={isLoading}>
                             {isLoading ? (
                                 <div className="google-btn-content">
                                     <div className="google-btn-spinner"></div>

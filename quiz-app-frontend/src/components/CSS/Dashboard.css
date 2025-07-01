@@ -1,20 +1,6 @@
 /* Dashboard chung */
 :root {
-  --primary-color: #ff4f9f;
-  --secondary-color: #b83dba;
-  --accent-color: #6a3093;
-  --background-color: #f9f9f9;
-  --card-color: #ffffff;
-  --text-color: #333333;
-  --text-light: #777777;
-  --border-color: #eaeaea;
-  --hover-color: #f3f3f3;
-  --blue: #4a8cff;
-  --green: #38c172;
-  --purple: #9561e2;
-  --red: #e3342f;
-  --yellow: #ffed4a;
-  --orange: #f6993f;
+  /* Các biến màu được định nghĩa trong colors.css */
   --sidebar-width: 280px;
 }
 
@@ -30,9 +16,9 @@
 }
 
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(255, 79, 159, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(255, 79, 159, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 79, 159, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(33, 150, 243, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(33, 150, 243, 0); }
 }
 
 @keyframes float {
@@ -1469,4 +1455,42 @@ input:checked + .slider:before {
   50% {
     transform: translateY(-15px);
   }
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.create-exam-btn {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 2px 5px rgba(25, 118, 210, 0.2);
+}
+
+.create-exam-btn:hover {
+  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-color) 100%);
+  box-shadow: 0 3px 8px rgba(25, 118, 210, 0.3);
+  transform: translateY(-2px);
+}
+
+.create-exam-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 3px rgba(25, 118, 210, 0.2);
+}
+
+.create-exam-btn i {
+  font-size: 0.9rem;
 }

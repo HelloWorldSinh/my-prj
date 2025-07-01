@@ -1,21 +1,5 @@
 /* SubmissionList.css */
-:root {
-  --primary-color: #ff4f9f;
-  --primary-hover: #e63c8a;
-  --secondary-color: #b83dba;
-  --accent-color: #6a3093;
-  --background-color: #f9f9f9;
-  --card-color: #ffffff;
-  --border-color: #eaeaea;
-  --text-color: #333333;
-  --text-light: #777777;
-  --success-color: #38c172;
-  --warning-color: #f6993f;
-  --danger-color: #e3342f;
-  --border-radius: 8px;
-  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --transition: all 0.3s ease;
-}
+/* Biến màu được định nghĩa trong colors.css */
 
 .submissions-list-container {
   max-width: 1200px;
@@ -42,7 +26,7 @@
   font-size: 2rem;
   font-weight: 700;
   color: var(--text-color);
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -114,7 +98,7 @@
 }
 
 .submissions-table thead {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  background: var(--gradient-primary);
   color: white;
 }
 
@@ -140,7 +124,7 @@
 }
 
 .submissions-table tbody tr:hover {
-  background-color: rgba(255, 79, 159, 0.05);
+  background-color: rgba(33, 150, 243, 0.05);
 }
 
 .score-cell {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../CSS/CreateExam.css';
-
 const CreateExam = () => {
     const [title, setTitle] = useState('');
     const [startTime, setStartTime] = useState('');
@@ -12,6 +12,7 @@ const CreateExam = () => {
     const [shuffleQuestions, setShuffleQuestions] = useState(false);
     const [shuffleAnswers, setShuffleAnswers] = useState(false);
     const [duration, setDuration] = useState('');
+    const navigate = useNavigate();
 
     const getAnswerLabel = (index) => String.fromCharCode(65 + index); // 65 = 'A'
 
@@ -154,6 +155,7 @@ const CreateExam = () => {
             setQuestions([]);
             setExamId(null);
             setExamCode('');
+            navigate('/exam-list');
         } catch (error) {
             alert(error.response.data.message);
         }
@@ -211,13 +213,27 @@ const CreateExam = () => {
                                 <h4><i className="fas fa-question-circle"></i> Câu hỏi {index + 1}</h4>
                             </div>
                             {question.isEditing ? (
-                                <div className="question-content">                                    <input
-                                    type="text"
-                                    className="question-input"
-                                    placeholder="Nhập nội dung câu hỏi"
-                                    value={question.content}
-                                    onChange={(e) => handleUpdateQuestion(index, 'content', e.target.value)}
-                                /><div className="file-input-container">
+                                <div className="question-content">
+                                    <div className="question-input-group">
+                                        <div className="question-input-container">
+                                            <input
+                                                type="text"
+                                                className="question-input"
+                                                placeholder="Nhập nội dung câu hỏi"
+                                                value={question.content}
+                                                onChange={(e) => handleUpdateQuestion(index, 'content', e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="question-actions">
+                                            <button
+                                                type="button"
+                                                className="btn btn-danger btn-small"
+                                                onClick={() => handleRemoveQuestion(index)}
+                                            >
+                                                <i className="fas fa-trash-alt"></i> Xóa
+                                            </button>
+                                        </div>
+                                    </div><div className="file-input-container">
                                         <label className="file-input-label">
                                             <i className="fas fa-cloud-upload-alt"></i>
                                             <input
@@ -332,15 +348,17 @@ const CreateExam = () => {
                                                 <div className="answer-content">{ans.content}</div>
                                             </li>
                                         ))}
-                                    </ul>                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleRemoveQuestion(index);
-                                        }}
-                                        className="btn btn-danger"
-                                    >
-                                        <i className="fas fa-trash"></i> Xóa
-                                    </button>
+                                    </ul>                                    <div className="question-actions" style={{ marginTop: '1rem' }}>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleRemoveQuestion(index);
+                                            }}
+                                            className="btn btn-danger"
+                                        >
+                                            <i className="fas fa-trash"></i> Xóa
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </div>

@@ -1,0 +1,99 @@
+/* colors.css - Bảng màu chủ đạo Blue cho toàn dự án */
+:root {
+  --primary-color: #0078d4;      /* Xanh da trời Microsoft */
+  --primary-hover: #0063b1;      /* Xanh da trời đậm hơn khi hover */
+  --secondary-color: #2196f3;    /* Xanh dương Material */
+  --accent-color: #40c4ff;       /* Xanh nhạt sáng */
+  --gradient-primary: linear-gradient(135deg, #0078d4 0%, #2196f3 100%); /* Gradient chính */
+  --gradient-secondary: linear-gradient(135deg, #40c4ff 0%, #0078d4 100%); /* Gradient phụ */
+  --gradient-success: linear-gradient(135deg, #00bcd4 0%, #009688 100%); /* Gradient thành công */
+  --gradient-danger: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); /* Gradient nguy hiểm */
+  --background-color: #f0f7ff;   /* Nền xanh rất nhạt */
+  --card-color: #ffffff;         /* Giữ nguyên màu trắng cho card */
+  --success-color: #00bcd4;      /* Xanh ngọc phù hợp với bảng màu */
+  --danger-color: #f44336;       /* Đỏ Material */
+  --warning-color: #ffab40;      /* Cam vàng nhạt hơn */
+  --text-color: #01579b;         /* Xanh đậm, dễ đọc */
+  --text-light: #03a9f4;         /* Xanh nhạt */
+  --border-color: #bbdefb;       /* Viền xanh nhạt */
+  --light-gray: #e3f2fd;         /* Xanh da trời rất nhạt */
+  --border-radius: 10px;         /* Bo tròn hơn một chút */
+  --box-shadow: 0 4px 12px rgba(33, 150, 243, 0.15);  /* Shadow xanh */
+  --transition: all 0.3s ease;   /* Chuyển động mượt mà */
+}
+
+/* Các class tiện ích cho các thành phần trong dự án */
+.blue-text {
+  color: var(--primary-color);
+}
+
+.blue-bg {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.blue-gradient {
+  background: var(--gradient-primary);
+  color: white;
+}
+
+.blue-gradient-text {
+  background: linear-gradient(to right, var(--primary-color), var(--secondary-color), var(--accent-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.blue-border {
+  border: 1px solid var(--border-color);
+}
+
+.blue-card {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  border: 1px solid var(--border-color);
+}
+
+.blue-button {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  padding: 0.7rem 1.2rem;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  transition: var(--transition);
+  box-shadow: 0 3px 8px rgba(33, 150, 243, 0.2);
+  cursor: pointer;
+}
+
+.blue-button:hover {
+  background: var(--gradient-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(33, 150, 243, 0.3);
+}
+
+/* Class để làm nổi bật câu hỏi */
+.highlighted-question {
+  background: linear-gradient(to right, #f0f7ff, white, #f0f7ff);
+  border-left: 4px solid var(--primary-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  color: var(--text-color);
+  transition: var(--transition);
+}
+
+.highlighted-question:hover {
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.25);
+  transform: translateY(-2px);
+}
+
+/* Hiệu ứng đặc biệt cho câu hỏi quan trọng */
+.important-question {
+  background: linear-gradient(to right, #e3f2fd, #bbdefb, #e3f2fd);
+  border-left: 4px solid var(--accent-color);
+  font-weight: 600;
+}
