@@ -1,9 +1,10 @@
 version: "3.8"
 services:
   app:
-    build: .
+    build: ./quiz-app-backend
     ports:
       - "3000:3000"
     volumes:
-      - .:/usr/src/app
+      - ./quiz-app-backend:/usr/src/app
+    working_dir: /usr/src/app
     command: node server.js
